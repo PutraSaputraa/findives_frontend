@@ -586,6 +586,23 @@ export default function App() {
                   </button>
                 ))}
               </div>
+
+              <label className="modal-item-select-label" htmlFor="availability-item-select">
+                Pilih item
+              </label>
+
+              <select
+                id="availability-item-select"
+                className="modal-item-select"
+                value={activeCalendarItem.id}
+                onChange={(event) => setActiveCalendarItemId(event.target.value)}
+              >
+                {equipmentData.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {getItemLabel(item)}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div className="availability-legend">
@@ -2049,6 +2066,13 @@ footer small {
   
 
 
+.modal-item-select-label,
+.modal-item-select {
+  display: none;
+}
+
+
+
 @media (max-width: 820px) {
   .modal-backdrop.availability-backdrop {
     position: fixed !important;
@@ -2056,6 +2080,7 @@ footer small {
     width: 100vw !important;
     height: 100dvh !important;
     padding: 0 !important;
+    margin: 0 !important;
     display: block !important;
     background: rgba(8, 37, 53, 0.96) !important;
     overflow: hidden !important;
@@ -2067,77 +2092,91 @@ footer small {
     width: 100vw !important;
     height: 100dvh !important;
     max-height: none !important;
-    padding: 16px 14px 110px !important;
-    border-radius: 0 !important;
+    margin: 0 !important;
+    padding: 16px 14px 24px !important;
     border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch;
-    box-shadow: none !important;
   }
 
   .availability-close {
     top: 14px !important;
     right: 14px !important;
-    width: 38px !important;
-    height: 38px !important;
-    font-size: 1rem !important;
+    width: 36px !important;
+    height: 36px !important;
+    font-size: 0.95rem !important;
   }
 
   .availability-modal-head {
-    padding-right: 46px;
+    padding-right: 44px !important;
   }
 
   .availability-modal-head h3 {
     padding-right: 0 !important;
-    font-size: clamp(1.75rem, 9vw, 2.55rem) !important;
+    font-size: clamp(1.8rem, 9.5vw, 2.45rem) !important;
     line-height: 0.92 !important;
-    letter-spacing: -0.03em;
+    letter-spacing: -0.035em !important;
   }
 
   .availability-modal-head p:not(.modal-kicker) {
-    margin-top: 10px !important;
-    font-size: 0.84rem !important;
+    margin-top: 8px !important;
+    font-size: 0.78rem !important;
     line-height: 1.45 !important;
   }
 
   .modal-kicker {
-    margin-bottom: 8px !important;
-    font-size: 0.68rem !important;
+    margin-bottom: 7px !important;
+    font-size: 0.64rem !important;
+    letter-spacing: 0.08em !important;
   }
 
   .modal-item-switcher {
-    margin-top: 14px !important;
-    display: flex !important;
-    gap: 7px !important;
-    overflow-x: auto !important;
-    padding-bottom: 6px !important;
-    scroll-snap-type: x mandatory;
+    display: none !important;
   }
 
-  .modal-item-switcher button {
-    max-width: 170px !important;
-    min-height: 36px !important;
-    padding: 8px 11px !important;
-    font-size: 0.78rem !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    scroll-snap-align: start;
+  .modal-item-select-label {
+    display: block;
+    margin-top: 14px;
+    color: var(--olive-green);
+    font-size: 0.68rem;
+    font-weight: 950;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .modal-item-select {
+    display: block;
+    width: 100%;
+    min-height: 42px;
+    margin-top: 6px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(37, 74, 90, 0.18);
+    color: var(--deep-navy);
+    background: var(--pale-blue-gray);
+    font-weight: 850;
+    outline: none;
   }
 
   .availability-legend {
     margin-top: 12px !important;
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
     gap: 6px !important;
   }
 
   .availability-legend span {
-    padding: 7px 9px !important;
-    font-size: 0.68rem !important;
+    justify-content: center !important;
+    padding: 7px 6px !important;
+    font-size: 0.62rem !important;
+    text-align: center !important;
   }
 
   .availability-legend i {
-    width: 10px !important;
-    height: 10px !important;
+    width: 8px !important;
+    height: 8px !important;
   }
 
   .calendar-grid {
@@ -2147,44 +2186,37 @@ footer small {
   }
 
   .calendar-day {
-    min-height: 104px !important;
-    padding: 12px !important;
-    border-radius: 17px !important;
+    min-height: 96px !important;
+    padding: 11px !important;
+    border-radius: 16px !important;
   }
 
   .calendar-day-name {
-    font-size: 0.68rem !important;
-  }
-
-  .calendar-day strong {
-    font-size: 1.95rem !important;
-  }
-
-  .calendar-day small {
-    font-size: 0.78rem !important;
-  }
-
-  .calendar-day b {
-    margin-top: 6px !important;
-    padding: 5px 8px !important;
     font-size: 0.62rem !important;
   }
 
+  .calendar-day strong {
+    font-size: 1.85rem !important;
+  }
+
+  .calendar-day small {
+    font-size: 0.72rem !important;
+  }
+
+  .calendar-day b {
+    margin-top: 5px !important;
+    padding: 5px 8px !important;
+    font-size: 0.58rem !important;
+  }
+
   .availability-modal-actions {
-    position: sticky !important;
-    bottom: 0 !important;
-    z-index: 5 !important;
-    margin: 18px -14px -110px !important;
-    padding: 14px 14px calc(14px + env(safe-area-inset-bottom)) !important;
+    position: static !important;
+    margin: 18px 0 0 !important;
+    padding: 0 0 calc(12px + env(safe-area-inset-bottom)) !important;
     display: grid !important;
     grid-template-columns: 1fr !important;
     gap: 9px !important;
-    background: linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0),
-      var(--white) 24%,
-      var(--white) 100%
-    ) !important;
+    background: transparent !important;
   }
 
   .availability-modal-actions .primary-btn,
