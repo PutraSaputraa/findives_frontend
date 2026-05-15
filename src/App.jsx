@@ -521,11 +521,7 @@ export default function App() {
         <div className="section-head availability-head">
           <span className="eyebrow">14 DAYS VIEW</span>
           <h2>AVAILABILITY</h2>
-          <p>Cek hari available untuk setiap item tanpa membuat kalender memenuhi layar mobile.</p>
-        </div>
-
-        <div className="availability-note">
-          <strong>Note:</strong> status availability diambil dari Firebase. Stok final tetap sebaiknya dikonfirmasi via WhatsApp.
+          <p>Cek hari available untuk setiap item.</p>
         </div>
 
         <div className="availability-card-grid">
