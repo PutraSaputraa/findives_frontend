@@ -18,7 +18,7 @@ const fallbackEquipment  = [
     startUnit: "/ 1 session",
     desc: "Long fins untuk latihan renang, freediving basic, dan pengalaman berenang lebih powerful.",
     badge: "Most Popular",
-    image: longFinsImage,
+    image: insta360,
     pricing: [
       {
         title: "Per Session",
