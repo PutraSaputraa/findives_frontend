@@ -824,7 +824,7 @@ a {
 }
 
 .nav-cta {
-  color: var(--deep-navy);
+  color: white;
   font-weight: 800;
   background: var(--sage-green);
 }
