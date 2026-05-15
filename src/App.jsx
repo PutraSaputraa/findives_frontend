@@ -5,9 +5,12 @@ import longFinsImage from "./assets/Frame 91.png";
 import maskImage from "./assets/Frame 92.png";
 import insta360 from "./assets/Frame 93.png";
 
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "./firebase";
+
 const WHATSAPP_NUMBER = "6281234567890";
 
-const equipment = [
+const fallbackEquipment  = [
   {
     id: "long-fins-premium",
     name: "Long Fins",
@@ -115,7 +118,7 @@ const weekdayOrder = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Min
 const weekdayByDateIndex = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
 const shortMonthNames = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
 
-const availabilitySchedule = {
+const fallbackAvailabilitySchedule  = {
   "long-fins-premium": {
     totalStock: 1,
     note: "Stok premium terbatas. Booking disarankan sebelum datang.",
@@ -234,17 +237,17 @@ const getNextDates = (count, startDate) =>
     };
   });
 
-const getStatusForDate = (itemId, dateInfo) => {
-  const schedule = availabilitySchedule[itemId];
+const getStatusForDate = (itemId, dateInfo, schedules) => {
+  const schedule = schedules[itemId];
   if (!schedule) return "available";
 
-  return schedule.overrides[dateInfo.key] || schedule.weekly[dateInfo.dayName] || "available";
+  return schedule.overrides?.[dateInfo.key] || schedule.weekly?.[dateInfo.dayName] || "available";
 };
 
-const getAvailabilitySummary = (itemId, dates) =>
+const getAvailabilitySummary = (itemId, dates, schedules) =>
   dates.reduce(
     (summary, dateInfo) => {
-      const status = getStatusForDate(itemId, dateInfo);
+      const status = getStatusForDate(itemId, dateInfo, schedules);
       summary[status] += 1;
       return summary;
     },
@@ -253,19 +256,120 @@ const getAvailabilitySummary = (itemId, dates) =>
 
 const getItemLabel = (item) => `${item.name} - ${item.badge}`;
 
+const normalizeWeekly = (weekly = {}) => ({
+  Senin: weekly.Senin || weekly.senin || "available",
+  Selasa: weekly.Selasa || weekly.selasa || "available",
+  Rabu: weekly.Rabu || weekly.rabu || "available",
+  Kamis: weekly.Kamis || weekly.kamis || "available",
+  Jumat: weekly.Jumat || weekly.jumat || "available",
+  Sabtu: weekly.Sabtu || weekly.sabtu || "available",
+  Minggu: weekly.Minggu || weekly.minggu || "available",
+});
+
 export default function App() {
+  const [equipmentData, setEquipmentData] = useState(fallbackEquipment);
+  const [availabilityData, setAvailabilityData] = useState(fallbackAvailabilitySchedule);
+  const [isLoadingFirebase, setIsLoadingFirebase] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
   const [selectedEquipment, setSelectedEquipment] = useState(null);
   const [calendarOpen, setCalendarOpen] = useState(false);
-  const [activeCalendarItemId, setActiveCalendarItemId] = useState(equipment[0].id);
+  const [activeCalendarItemId, setActiveCalendarItemId] = useState(fallbackEquipment[0].id);
   const [today, setToday] = useState(getStartOfToday);
+
+  useEffect(() => {
+    const loadFirebaseData = async () => {
+      try {
+        setIsLoadingFirebase(true);
+
+        const itemsSnapshot = await getDocs(collection(db, "items"));
+        const availabilitySnapshot = await getDocs(collection(db, "availability"));
+
+        const localImageById = fallbackEquipment.reduce((result, item) => {
+          result[item.id] = item.image;
+          return result;
+        }, {});
+
+        const localPricingById = fallbackEquipment.reduce((result, item) => {
+          result[item.id] = item.pricing;
+          return result;
+        }, {});
+
+        const itemsFromFirebase = itemsSnapshot.docs
+          .map((document) => {
+            const data = document.data();
+
+            return {
+              id: document.id,
+              name: data.name || "Unnamed Item",
+              startPrice: data.startPrice || "0",
+              startUnit: data.startUnit || "/ session",
+              desc: data.desc || "",
+              badge: data.badge || "Ready Stock",
+              totalStock: data.totalStock || 1,
+              note: data.note || data.desc || "",
+              weekly: normalizeWeekly(data.weekly),
+              image: localImageById[document.id] || longFinsImage,
+              pricing: data.pricing || localPricingById[document.id] || [],
+            };
+          })
+          .filter((item) => item.isActive !== false);
+
+        const nextEquipment = itemsFromFirebase.length > 0 ? itemsFromFirebase : fallbackEquipment;
+
+        const nextSchedules = {};
+
+        nextEquipment.forEach((item) => {
+          const fallbackSchedule = fallbackAvailabilitySchedule[item.id] || {};
+
+          nextSchedules[item.id] = {
+            totalStock: item.totalStock || fallbackSchedule.totalStock || 1,
+            note: item.note || fallbackSchedule.note || item.desc,
+            weekly: item.weekly || fallbackSchedule.weekly || normalizeWeekly(),
+            overrides: {},
+          };
+        });
+
+        availabilitySnapshot.docs.forEach((document) => {
+          const data = document.data();
+
+          if (!data.itemId || !data.date || !data.status) return;
+
+          if (!nextSchedules[data.itemId]) {
+            nextSchedules[data.itemId] = {
+              totalStock: 1,
+              note: "",
+              weekly: normalizeWeekly(),
+              overrides: {},
+            };
+          }
+
+          nextSchedules[data.itemId].overrides[data.date] = data.status;
+        });
+
+        setEquipmentData(nextEquipment);
+        setAvailabilityData(nextSchedules);
+
+        if (!nextEquipment.some((item) => item.id === activeCalendarItemId)) {
+          setActiveCalendarItemId(nextEquipment[0]?.id || fallbackEquipment[0].id);
+        }
+      } catch (error) {
+        console.error("Gagal mengambil data Firebase:", error);
+        setEquipmentData(fallbackEquipment);
+        setAvailabilityData(fallbackAvailabilitySchedule);
+      } finally {
+        setIsLoadingFirebase(false);
+      }
+    };
+
+    loadFirebaseData();
+  }, []);
 
   const openWhatsApp = (message) => {
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, "_blank");
   };
 
   const nextDates = getNextDates(14, today);
-  const activeCalendarItem = equipment.find((item) => item.id === activeCalendarItemId) || equipment[0];
+  const activeCalendarItem = equipmentData.find((item) => item.id === activeCalendarItemId) || equipment[0];
 
   const openAvailabilityCalendar = (itemId) => {
     setActiveCalendarItemId(itemId);
@@ -383,7 +487,7 @@ export default function App() {
         </div>
 
         <div className="equipment-grid">
-          {equipment.map((item) => (
+          {equipmentData.map((item) => (
             <article className="equipment-card" key={item.id}>
               <div className="equipment-image" style={{ backgroundImage: `url(${item.image})` }}>
                 <span>{item.badge}</span>
@@ -423,9 +527,9 @@ export default function App() {
         </div>
 
         <div className="availability-card-grid">
-          {equipment.map((item) => {
-            const summary = getAvailabilitySummary(item.id, nextDates);
-            const schedule = availabilitySchedule[item.id];
+          {equipmentData.map((item) => {
+            const summary = getAvailabilitySummary(item.id, nextDates, availabilityData);
+            const schedule = availabilityData[item.id];
 
             return (
               <article className="availability-card" key={item.id}>
@@ -478,7 +582,7 @@ export default function App() {
               <p>{availabilitySchedule[activeCalendarItem.id].note}</p>
 
               <div className="modal-item-switcher" aria-label="Pilih item availability">
-                {equipment.map((item) => (
+                {equipmentData.map((item) => (
                   <button
                     key={item.id}
                     className={item.id === activeCalendarItem.id ? "active" : ""}
@@ -498,7 +602,7 @@ export default function App() {
 
             <div className="calendar-grid">
               {nextDates.map((dateInfo) => {
-                const status = getStatusForDate(activeCalendarItem.id, dateInfo);
+                const status = getStatusForDate(activeCalendarItem.id, dateInfo, availabilityData);
                 const meta = statusMeta[status];
 
                 return (
