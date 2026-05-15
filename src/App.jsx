@@ -369,7 +369,10 @@ export default function App() {
   };
 
   const nextDates = getNextDates(14, today);
-  const activeCalendarItem = equipmentData.find((item) => item.id === activeCalendarItemId) || equipment[0];
+  const activeCalendarItem =
+    equipmentData.find((item) => item.id === activeCalendarItemId) ||
+    equipmentData[0] ||
+    fallbackEquipment[0];
 
   const openAvailabilityCalendar = (itemId) => {
     setActiveCalendarItemId(itemId);
@@ -522,14 +525,18 @@ export default function App() {
         </div>
 
         <div className="availability-note">
-          <strong>Note:</strong> status ini masih data manual di kode. Tanggal otomatis maju setiap hari,
-          tapi stok final tetap sebaiknya dikonfirmasi via WhatsApp.
+          <strong>Note:</strong> status availability diambil dari Firebase. Stok final tetap sebaiknya dikonfirmasi via WhatsApp.
         </div>
 
         <div className="availability-card-grid">
           {equipmentData.map((item) => {
             const summary = getAvailabilitySummary(item.id, nextDates, availabilityData);
-            const schedule = availabilityData[item.id];
+            const schedule = availabilityData[item.id] || {
+              totalStock: item.totalStock || 1,
+              note: item.note || item.desc || "",
+              weekly: normalizeWeekly(),
+              overrides: {},
+            };
 
             return (
               <article className="availability-card" key={item.id}>
@@ -579,7 +586,7 @@ export default function App() {
             <div className="availability-modal-head">
               <p className="modal-kicker">14 DAYS CALENDAR</p>
               <h3 id="availability-modal-title">{getItemLabel(activeCalendarItem)}</h3>
-              <p>{availabilitySchedule[activeCalendarItem.id].note}</p>
+              <p>{availabilityData[activeCalendarItem.id]?.note || activeCalendarItem.note || activeCalendarItem.desc}</p>
 
               <div className="modal-item-switcher" aria-label="Pilih item availability">
                 {equipmentData.map((item) => (
