@@ -500,9 +500,6 @@ export default function App() {
                   <button onClick={() => setSelectedEquipment(item)}>
                     View Price Detail
                   </button>
-                  <button className="outline-card-btn" onClick={() => openAvailabilityCalendar(item.id)}>
-                    Cek Availability
-                  </button>
                 </div>
               </div>
             </article>
@@ -1263,22 +1260,31 @@ a {
   cursor: pointer;
 }
 
-.availability-backdrop {
-  align-items: center;
+.modal-backdrop.availability-backdrop {
+  padding: 0;
+  place-items: stretch;
+  align-items: stretch;
 }
 
 .availability-modal {
-  position: relative;
-  width: min(860px, 100%);
-  max-height: min(90svh, 780px);
-  overflow: auto;
-  padding: clamp(18px, 4vw, 30px);
-  border-radius: 30px;
-  background:
-    radial-gradient(circle at top right, rgba(152, 187, 215, 0.22), transparent 18rem),
-    var(--white);
-  border: 1px solid rgba(212, 225, 231, 0.44);
-  box-shadow: 0 30px 90px rgba(8, 37, 53, 0.38);
+  width: 100%;
+  height: 100svh;
+  height: 100dvh;
+  max-height: 100svh;
+  max-height: 100dvh;
+  border-radius: 0;
+  padding: 18px 14px 90px;
+}
+
+.availability-modal-actions {
+  position: sticky;
+  bottom: 0;
+  margin: 18px -14px -90px;
+  padding: 14px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0), var(--white) 28%);
 }
 
 .availability-close {
