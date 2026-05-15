@@ -5,8 +5,6 @@ import longFinsImage from "./assets/Frame 91.png";
 import maskImage from "./assets/Frame 92.png";
 import insta360 from "./assets/Frame 93.png";
 
-import { seedFirestore } from "./seedFirestore";
-
 const WHATSAPP_NUMBER = "6281234567890";
 
 const equipment = [
@@ -416,19 +414,6 @@ export default function App() {
         <div className="section-head availability-head">
           <span className="eyebrow">14 DAYS VIEW</span>
           <h2>AVAILABILITY</h2>
-          <button
-  onClick={seedFirestore}
-  style={{
-    position: "fixed",
-    zIndex: 9999,
-    right: 20,
-    bottom: 80,
-    padding: "12px 16px",
-    borderRadius: 999,
-  }}
->
-  Seed Firestore
-</button>
           <p>Cek hari available untuk setiap item tanpa membuat kalender memenuhi layar mobile.</p>
         </div>
 
