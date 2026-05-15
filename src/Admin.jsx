@@ -24,6 +24,19 @@ const defaultWeekly = {
 };
 
 export default function Admin() {
+    const [newItem, setNewItem] = useState({
+        id: "",
+        name: "",
+        startPrice: "",
+        startUnit: "/ session",
+        desc: "",
+        badge: "Ready Stock",
+        totalStock: 1,
+        note: "",
+        isActive: true,
+        weekly: defaultWeekly,
+        });
+
   const [user, setUser] = useState(null);
   const [login, setLogin] = useState({ email: "", password: "" });
   const [items, setItems] = useState([]);
@@ -135,6 +148,54 @@ export default function Admin() {
       setMessage(`Gagal update item: ${error.message}`);
     }
   };
+
+  const handleAddItem = async (event) => {
+    event.preventDefault();
+    setMessage("");
+
+    const cleanId = newItem.id
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, "-")
+        .replace(/[^a-z0-9-]/g, "");
+
+    if (!cleanId || !newItem.name || !newItem.startPrice) {
+        setMessage("ID item, nama, dan harga mulai wajib diisi.");
+        return;
+    }
+
+    try {
+        await setDoc(doc(db, "items", cleanId), {
+        name: newItem.name,
+        startPrice: newItem.startPrice,
+        startUnit: newItem.startUnit,
+        desc: newItem.desc,
+        badge: newItem.badge,
+        totalStock: Number(newItem.totalStock || 1),
+        note: newItem.note || newItem.desc || "",
+        isActive: true,
+        weekly: newItem.weekly || defaultWeekly,
+        });
+
+        setMessage("Item baru berhasil ditambahkan.");
+        setNewItem({
+        id: "",
+        name: "",
+        startPrice: "",
+        startUnit: "/ session",
+        desc: "",
+        badge: "Ready Stock",
+        totalStock: 1,
+        note: "",
+        isActive: true,
+        weekly: defaultWeekly,
+        });
+
+        await loadItems();
+    } catch (error) {
+        setMessage(`Gagal menambahkan item: ${error.message}`);
+    }
+    };
 
   if (!user) {
     return (
@@ -316,6 +377,94 @@ export default function Admin() {
           <button type="button" style={styles.dangerButton} onClick={handleDeleteOverride}>
             Hapus Override Tanggal Ini
           </button>
+        </form>
+        <h2>Tambah Item Baru</h2>
+        <form onSubmit={handleAddItem} style={styles.form}>
+        <label>
+            ID Item
+            <input
+            style={styles.input}
+            placeholder="contoh: short-fins-anak"
+            value={newItem.id}
+            onChange={(event) => setNewItem({ ...newItem, id: event.target.value })}
+            required
+            />
+        </label>
+
+        <label>
+            Nama Item
+            <input
+            style={styles.input}
+            placeholder="contoh: Short Fins Anak"
+            value={newItem.name}
+            onChange={(event) => setNewItem({ ...newItem, name: event.target.value })}
+            required
+            />
+        </label>
+
+        <label>
+            Badge
+            <input
+            style={styles.input}
+            placeholder="contoh: New Arrival"
+            value={newItem.badge}
+            onChange={(event) => setNewItem({ ...newItem, badge: event.target.value })}
+            />
+        </label>
+
+        <label>
+            Harga Mulai
+            <input
+            style={styles.input}
+            placeholder="contoh: 20K"
+            value={newItem.startPrice}
+            onChange={(event) => setNewItem({ ...newItem, startPrice: event.target.value })}
+            required
+            />
+        </label>
+
+        <label>
+            Satuan Harga
+            <input
+            style={styles.input}
+            placeholder="contoh: / session"
+            value={newItem.startUnit}
+            onChange={(event) => setNewItem({ ...newItem, startUnit: event.target.value })}
+            />
+        </label>
+
+        <label>
+            Total Stok
+            <input
+            type="number"
+            min="1"
+            style={styles.input}
+            value={newItem.totalStock}
+            onChange={(event) => setNewItem({ ...newItem, totalStock: event.target.value })}
+            />
+        </label>
+
+        <label>
+            Deskripsi
+            <textarea
+            style={styles.textarea}
+            placeholder="Deskripsi item"
+            value={newItem.desc}
+            onChange={(event) => setNewItem({ ...newItem, desc: event.target.value })}
+            />
+        </label>
+
+        <label>
+            Note Availability
+            <textarea
+            style={styles.textarea}
+            placeholder="Catatan stok atau availability"
+            value={newItem.note}
+            onChange={(event) => setNewItem({ ...newItem, note: event.target.value })}
+            />
+        </label>
+
+        <button style={styles.button}>Tambah Item</button>
         </form>
       </section>
     </main>
