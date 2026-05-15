@@ -267,8 +267,8 @@ const normalizeWeekly = (weekly = {}) => ({
 });
 
 export default function App() {
-  const [equipmentData, setEquipmentData] = useState(fallbackEquipment);
-  const [availabilityData, setAvailabilityData] = useState(fallbackAvailabilitySchedule);
+  const [equipmentData, setEquipmentData] = useState([]);
+  const [availabilityData, setAvailabilityData] = useState({});
   const [isLoadingFirebase, setIsLoadingFirebase] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
   const [selectedEquipment, setSelectedEquipment] = useState(null);
