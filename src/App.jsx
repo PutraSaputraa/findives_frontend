@@ -2057,4 +2057,56 @@ footer small {
     height: 52px;
   }
 }
+  
+
+@media (max-width: 820px) {
+  .modal-backdrop.availability-backdrop {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: block !important;
+    place-items: unset !important;
+    align-items: unset !important;
+    overflow: hidden !important;
+  }
+
+  .modal-backdrop.availability-backdrop .availability-modal {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    max-width: none !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    margin: 0 !important;
+    padding: 18px 14px 96px !important;
+    border-radius: 0 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .availability-modal-actions {
+    position: sticky;
+    bottom: 0;
+    margin: 20px -14px -96px;
+    padding: 14px;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0),
+      var(--white) 28%
+    );
+  }
+
+  .availability-modal-head h3 {
+    font-size: clamp(1.8rem, 10vw, 2.8rem);
+    padding-right: 52px;
+  }
+
+  .calendar-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
 `;
