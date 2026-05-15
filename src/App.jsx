@@ -1967,17 +1967,6 @@ footer small {
   .availability-modal-actions .primary-btn {
     width: 100%;
   }
-
-  .availability-backdrop {
-    align-items: end;
-    padding: 10px;
-  }
-
-  .availability-modal {
-    width: 100%;
-    max-height: 86svh;
-    border-radius: 28px 28px 18px 18px;
-  }
 }
 
 @media (min-width: 640px) {
@@ -2059,54 +2048,150 @@ footer small {
 }
   
 
+
 @media (max-width: 820px) {
   .modal-backdrop.availability-backdrop {
     position: fixed !important;
     inset: 0 !important;
     width: 100vw !important;
     height: 100dvh !important;
-    min-height: 100dvh !important;
     padding: 0 !important;
-    margin: 0 !important;
     display: block !important;
-    place-items: unset !important;
-    align-items: unset !important;
+    background: rgba(8, 37, 53, 0.96) !important;
     overflow: hidden !important;
   }
 
-  .modal-backdrop.availability-backdrop .availability-modal {
+  .availability-modal {
     position: fixed !important;
     inset: 0 !important;
     width: 100vw !important;
-    max-width: none !important;
     height: 100dvh !important;
-    max-height: 100dvh !important;
-    margin: 0 !important;
-    padding: 18px 14px 96px !important;
+    max-height: none !important;
+    padding: 16px 14px 110px !important;
     border-radius: 0 !important;
+    border: 0 !important;
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch;
+    box-shadow: none !important;
   }
 
-  .availability-modal-actions {
-    position: sticky;
-    bottom: 0;
-    margin: 20px -14px -96px;
-    padding: 14px;
-    background: linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0),
-      var(--white) 28%
-    );
+  .availability-close {
+    top: 14px !important;
+    right: 14px !important;
+    width: 38px !important;
+    height: 38px !important;
+    font-size: 1rem !important;
+  }
+
+  .availability-modal-head {
+    padding-right: 46px;
   }
 
   .availability-modal-head h3 {
-    font-size: clamp(1.8rem, 10vw, 2.8rem);
-    padding-right: 52px;
+    padding-right: 0 !important;
+    font-size: clamp(1.75rem, 9vw, 2.55rem) !important;
+    line-height: 0.92 !important;
+    letter-spacing: -0.03em;
+  }
+
+  .availability-modal-head p:not(.modal-kicker) {
+    margin-top: 10px !important;
+    font-size: 0.84rem !important;
+    line-height: 1.45 !important;
+  }
+
+  .modal-kicker {
+    margin-bottom: 8px !important;
+    font-size: 0.68rem !important;
+  }
+
+  .modal-item-switcher {
+    margin-top: 14px !important;
+    display: flex !important;
+    gap: 7px !important;
+    overflow-x: auto !important;
+    padding-bottom: 6px !important;
+    scroll-snap-type: x mandatory;
+  }
+
+  .modal-item-switcher button {
+    max-width: 170px !important;
+    min-height: 36px !important;
+    padding: 8px 11px !important;
+    font-size: 0.78rem !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    scroll-snap-align: start;
+  }
+
+  .availability-legend {
+    margin-top: 12px !important;
+    gap: 6px !important;
+  }
+
+  .availability-legend span {
+    padding: 7px 9px !important;
+    font-size: 0.68rem !important;
+  }
+
+  .availability-legend i {
+    width: 10px !important;
+    height: 10px !important;
   }
 
   .calendar-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: 14px !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 9px !important;
+  }
+
+  .calendar-day {
+    min-height: 104px !important;
+    padding: 12px !important;
+    border-radius: 17px !important;
+  }
+
+  .calendar-day-name {
+    font-size: 0.68rem !important;
+  }
+
+  .calendar-day strong {
+    font-size: 1.95rem !important;
+  }
+
+  .calendar-day small {
+    font-size: 0.78rem !important;
+  }
+
+  .calendar-day b {
+    margin-top: 6px !important;
+    padding: 5px 8px !important;
+    font-size: 0.62rem !important;
+  }
+
+  .availability-modal-actions {
+    position: sticky !important;
+    bottom: 0 !important;
+    z-index: 5 !important;
+    margin: 18px -14px -110px !important;
+    padding: 14px 14px calc(14px + env(safe-area-inset-bottom)) !important;
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 9px !important;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0),
+      var(--white) 24%,
+      var(--white) 100%
+    ) !important;
+  }
+
+  .availability-modal-actions .primary-btn,
+  .availability-modal-actions .secondary-modal-btn {
+    width: 100% !important;
+    min-height: 46px !important;
   }
 }
+
 `;
