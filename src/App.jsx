@@ -473,12 +473,6 @@ export default function App() {
             >
               Booking via WhatsApp
             </button>
-            <a className="secondary-btn" href="#equipment">
-              Lihat Pricelist
-            </a>
-            <a className="secondary-btn" href="#availability">
-              Cek Availability
-            </a>
           </div>
         </div>
       </section>
