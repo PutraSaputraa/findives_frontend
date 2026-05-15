@@ -13,7 +13,7 @@ const WHATSAPP_NUMBER = "6281234567890";
 const fallbackEquipment  = [
   {
     id: "long-fins-premium",
-    name: "Long Fins",
+    name: "Long Fins premium",
     startPrice: "35k",
     startUnit: "/ 1 session",
     desc: "Long fins untuk latihan renang, freediving basic, dan pengalaman berenang lebih powerful.",
@@ -36,7 +36,7 @@ const fallbackEquipment  = [
   },
   {
     id: "long-fins-basic",
-    name: "Long Fins",
+    name: "Long Fins Basic",
     startPrice: "35k",
     startUnit: "/ 1 session",
     desc: "Long fins untuk latihan renang, freediving basic, dan pengalaman berenang lebih powerful.",
