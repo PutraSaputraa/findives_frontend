@@ -5,7 +5,7 @@ import longFinsImage from "./assets/Frame 91.png";
 import maskImage from "./assets/Frame 92.png";
 import insta360 from "./assets/Frame 93.png";
 
-const WHATSAPP_NUMBER = "6285799759626";
+const WHATSAPP_NUMBER = "62895421909289";
 
 const fallbackEquipment  = [
   {
