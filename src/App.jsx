@@ -11,102 +11,32 @@ const fallbackEquipment  = [
   {
     id: "long-fins-premium",
     name: "Long Fins premium",
-    startPrice: "35k",
-    startUnit: "/ 1 session",
     desc: "Long fins untuk latihan renang, freediving basic, dan pengalaman berenang lebih powerful.",
-    badge: "Most Popular",
     image: longFinsImage,
-    pricing: [
-      {
-        title: "Per Session",
-        items: [
-          ["session", "35k"],
-        ],
-      },
-      {
-        title: "Per Hari",
-        items: [
-          ["1 hari", "125k"],
-        ],
-      },
-    ],
   },
   {
     id: "long-fins-basic",
     name: "Long Fins Basic",
-    startPrice: "35k",
-    startUnit: "/ 1 session",
     desc: "Long fins untuk latihan renang, freediving basic, dan pengalaman berenang lebih powerful.",
-    badge: "Most Popular",
     image: longFinsImage,
-    pricing: [
-      {
-        title: "Per Session",
-        items: [
-          ["session", "35K"],
-        ],
-      },
-      {
-        title: "Per Hari",
-        items: [
-          ["1 hari", "70k"],
-        ],
-      },
-    ],
   },
   {
     id: "snorkeling-mask",
     name: "Snorkeling Mask",
-    startPrice: "15K",
-    startUnit: "/ session",
     desc: "Mask nyaman untuk snorkeling ringan, latihan di kolam, dan kebutuhan basic underwater.",
-    badge: "Ready Stock",
     image: maskImage,
-    pricing: [
-      {
-        title: "Per Session",
-        items: [
-          ["session", "15K"],
-        ],
-      },
-    ],
   },
   {
     id: "low-volume-mask",
     name: "Low Volume Mask",
-    startPrice: "20K",
-    startUnit: "/ session",
     desc: "Mask low volume untuk pengalaman underwater yang lebih nyaman dan compact.",
-    badge: "Compact Fit",
     image: maskImage,
-    pricing: [
-      {
-        title: "Per Session",
-        items: [
-          ["session", "20K"],
-        ],
-      },
-    ],
   },
   {
     id: "insta360",
     name: "Insta360",
-    startPrice: "150K",
-    startUnit: "/ 1 jam",
     desc: "Camera 360 derajat untuk merekam pengalaman underwater yang unik.",
-    badge: "New Arrival",
     image: insta360,
-    pricing: [
-      {
-        title: "Per Jam",
-        items: [
-          ["3 jam", "150K"],
-          ["6 jam", "225K"],
-          ["9 jam", "275K"],
-          ["12 jam", "300K"],
-        ],
-      },
-    ],
   },
 ];
 
@@ -115,7 +45,6 @@ export default function App() {
   const equipmentData = fallbackEquipment;
   const [menuOpen, setMenuOpen] = useState(false);
   const [navbarHidden, setNavbarHidden] = useState(false);
-  const [selectedEquipment, setSelectedEquipment] = useState(null);
 
   useEffect(() => {
     let lastScrollY = window.scrollY;
@@ -149,27 +78,9 @@ export default function App() {
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, "_blank");
   };
 
-  useEffect(() => {
-    if (!selectedEquipment) return;
-
-    const handleKeyDown = (event) => {
-      if (event.key === "Escape") {
-        setSelectedEquipment(null);
-      }
-    };
-
-    document.body.style.overflow = "hidden";
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      document.body.style.overflow = "";
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [selectedEquipment]);
-
   const navItems = [
     ["Home", "#home"],
-    ["Pricelist", "#equipment"],
+    ["Equipment", "#equipment"],
   ];
 
   return (
@@ -239,93 +150,21 @@ export default function App() {
       <section className="section equipment" id="equipment">
         <div className="section-head">
           <h2>OUR EQUIPMENT</h2>
-          <p>AVAILABLE TO RENT</p>
+          <p>PRODUK YANG KAMI MILIKI</p>
         </div>
 
         <div className="equipment-grid">
           {equipmentData.map((item) => (
             <article className="equipment-card" key={item.id}>
-              <div className="equipment-image" style={{ backgroundImage: `url(${item.image})` }}>
-                <span>{item.badge}</span>
-              </div>
+              <div className="equipment-image" style={{ backgroundImage: `url(${item.image})` }} />
               <div className="equipment-body">
                 <h3>{item.name}</h3>
-                <span className="price-label">Mulai dari</span>
-                <p className="price">
-                  {item.startPrice} <small>{item.startUnit}</small>
-                </p>
                 <p>{item.desc}</p>
-                <div className="equipment-actions">
-                  <button onClick={() => setSelectedEquipment(item)}>
-                    View Price Detail
-                  </button>
-                </div>
               </div>
             </article>
           ))}
         </div>
       </section>
-
-      {selectedEquipment && (
-        <div className="modal-backdrop" onClick={() => setSelectedEquipment(null)}>
-          <div
-            className="price-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="price-modal-title"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              className="modal-close"
-              onClick={() => setSelectedEquipment(null)}
-              aria-label="Close price detail"
-            >
-              x
-            </button>
-
-            <div
-              className="modal-image"
-              style={{ backgroundImage: `url(${selectedEquipment.image})` }}
-            >
-              <span>{selectedEquipment.badge}</span>
-            </div>
-
-            <div className="modal-content">
-              <p className="modal-kicker">PRICE DETAIL</p>
-              <h3 id="price-modal-title">{selectedEquipment.name}</h3>
-              <p className="modal-desc">{selectedEquipment.desc}</p>
-
-              <div className="modal-price-grid">
-                {selectedEquipment.pricing.map((group) => (
-                  <div className="modal-price-group" key={group.title}>
-                    <h4>{group.title}</h4>
-                    {group.items.map(([label, price]) => (
-                      <div className="modal-price-row" key={label}>
-                        <span>{label}</span>
-                        <strong>{price}</strong>
-                      </div>
-                    ))}
-                  </div>
-                ))}
-              </div>
-
-              <div className="modal-actions">
-                <button
-                  className="primary-btn"
-                  onClick={() =>
-                    openWhatsApp(`Halo findive.id, saya ingin sewa ${selectedEquipment.name}.`)
-                  }
-                >
-                  Booking via WhatsApp
-                </button>
-                <button className="secondary-modal-btn" onClick={() => setSelectedEquipment(null)}>
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       <footer>
         <h2>findive.id</h2>
@@ -591,8 +430,7 @@ a {
 }
 
 .primary-btn,
-.secondary-btn,
-.equipment-body button {
+.secondary-btn {
   min-height: 48px;
   padding: 14px 20px;
   display: inline-flex;
@@ -662,8 +500,7 @@ a {
 }
 
 .highlight-grid,
-.equipment-grid,
-.pricing-grid {
+.equipment-grid {
   display: grid;
   gap: 16px;
 }
@@ -718,32 +555,12 @@ a {
   background: rgba(255, 255, 255, 0.92);
   border: 1px solid rgba(37, 74, 90, 0.12);
   box-shadow: 0 24px 80px rgba(8, 37, 53, 0.14);
-  transition: transform 0.25s ease, border-color 0.25s ease;
-}
-
-.equipment-card:hover {
-  transform: translateY(-7px);
-  border-color: rgba(37, 74, 90, 0.26);
 }
 
 .equipment-image {
   min-height: 220px;
-  padding: 18px;
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-end;
   background-size: cover;
   background-position: center;
-}
-
-.equipment-image span,
-.pricing-card span {
-  padding: 8px 12px;
-  border-radius: 999px;
-  color: var(--white);
-  background: var(--dark-teal);
-  font-size: 0.78rem;
-  font-weight: 950;
 }
 
 .equipment-body {
@@ -756,240 +573,10 @@ a {
   font-size: 1.45rem;
 }
 
-.price-label {
-  display: inline-block;
-  margin-top: 14px;
-  color: var(--olive-green);
-  font-size: 0.78rem;
-  font-weight: 950;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.price {
-  margin: 6px 0 12px;
-  color: var(--dark-teal);
-  font-size: 2.7rem;
-  line-height: 1;
-  font-weight: 950;
-}
-
-.price small {
-  color: var(--dark-teal);
-  font-size: 0.9rem;
-  font-weight: 700;
-}
-
-.equipment-body p:not(.price) {
-  min-height: 76px;
+.equipment-body p {
+  margin: 12px 0 0;
   color: var(--dark-teal);
   line-height: 1.55;
-}
-
-.equipment-body button {
-  width: 100%;
-  color: var(--white);
-  background: var(--olive-green);
-}
-
-
-.equipment-actions {
-  display: grid;
-  gap: 10px;
-}
-
-.outline-card-btn {
-  color: var(--deep-navy) !important;
-  background: transparent !important;
-  border: 1px solid rgba(37, 74, 90, 0.22) !important;
-}
-
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  padding: 16px;
-  display: grid;
-  place-items: center;
-  background: rgba(2, 6, 23, 0.72);
-  backdrop-filter: blur(14px);
-}
-
-.price-modal {
-  position: relative;
-  width: min(940px, 100%);
-  max-height: min(90svh, 760px);
-  overflow: auto;
-  display: grid;
-  grid-template-columns: 0.88fr 1.12fr;
-  border-radius: 30px;
-  background: var(--pale-blue-gray);
-  border: 1px solid rgba(212, 225, 231, 0.42);
-  box-shadow: 0 30px 90px rgba(8, 37, 53, 0.38);
-}
-
-.modal-close {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  z-index: 2;
-  width: 42px;
-  height: 42px;
-  border: 0;
-  border-radius: 50%;
-  color: var(--white);
-  background: rgba(8, 37, 53, 0.82);
-  cursor: pointer;
-  font-size: 1.1rem;
-  font-weight: 950;
-  line-height: 1;
-}
-
-.modal-image {
-  min-height: 100%;
-  padding: 18px;
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-start;
-  background-size: cover;
-  background-position: center;
-}
-
-.modal-image span {
-  padding: 8px 12px;
-  border-radius: 999px;
-  color: var(--white);
-  background: var(--dark-teal);
-  font-size: 0.78rem;
-  font-weight: 950;
-}
-
-.modal-content {
-  padding: clamp(24px, 5vw, 38px);
-  background:
-    radial-gradient(circle at top right, rgba(152, 187, 215, 0.34), transparent 16rem),
-    var(--white);
-}
-
-.modal-kicker {
-  margin: 0 0 8px;
-  color: var(--olive-green);
-  font-size: 0.78rem;
-  font-weight: 950;
-  letter-spacing: 0.1em;
-}
-
-.modal-content h3 {
-  margin: 0;
-  color: var(--deep-navy);
-  font-size: clamp(2rem, 6vw, 3.4rem);
-  font-style: italic;
-  line-height: 0.95;
-  text-transform: uppercase;
-}
-
-.modal-desc {
-  margin: 14px 0 0;
-  color: var(--dark-teal);
-  line-height: 1.6;
-}
-
-.modal-price-grid {
-  margin-top: 22px;
-  display: grid;
-  gap: 12px;
-}
-
-.modal-price-group {
-  padding: 16px;
-  border-radius: 22px;
-  background: var(--pale-blue-gray);
-  border: 1px solid rgba(37, 74, 90, 0.12);
-}
-
-.modal-price-group h4 {
-  margin: 0 0 12px;
-  color: var(--deep-navy);
-  font-size: 1rem;
-  text-transform: uppercase;
-}
-
-.modal-price-row {
-  min-height: 42px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  border-top: 1px solid rgba(37, 74, 90, 0.12);
-  color: var(--dark-teal);
-}
-
-.modal-price-row:first-of-type {
-  border-top: 0;
-}
-
-.modal-price-row strong {
-  color: var(--deep-navy);
-  font-size: 1.15rem;
-}
-
-.modal-actions {
-  margin-top: 22px;
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.secondary-modal-btn {
-  min-height: 48px;
-  padding: 14px 20px;
-  border-radius: 999px;
-  border: 1px solid rgba(37, 74, 90, 0.18);
-  color: var(--dark-teal);
-  background: var(--white);
-  cursor: pointer;
-  font-weight: 900;
-}
-
-.pricelist {
-  width: 100%;
-  padding-inline: max(16px, calc((100% - 1160px) / 2));
-  background: linear-gradient(180deg, var(--pale-blue-gray), var(--white));
-}
-
-.pricing-grid {
-  grid-template-columns: 1fr;
-}
-
-.pricing-card {
-  padding: 28px;
-  border-radius: 28px;
-  background: rgba(255, 255, 255, 0.96);
-  border: 1px solid rgba(37, 74, 90, 0.12);
-  box-shadow: 0 22px 60px rgba(8, 37, 53, 0.1);
-}
-
-.pricing-card:nth-child(2) span {
-  background: var(--sage-green);
-  color: var(--white);
-}
-
-.pricing-card h3 {
-  margin: 26px 0 0;
-  color: var(--dark-teal);
-  font-size: clamp(4rem, 16vw, 6.4rem);
-  line-height: 0.85;
-}
-
-.pricing-card p {
-  margin: 8px 0 22px;
-  color: var(--dark-teal);
-  font-weight: 800;
-}
-
-.pricing-card small {
-  color: var(--dark-teal);
-  line-height: 1.6;
 }
 
 .note {
@@ -1344,20 +931,6 @@ footer small {
     max-width: 100%;
   }
 
-  .price-modal {
-    grid-template-columns: 1fr;
-    border-radius: 24px;
-  }
-
-  .modal-image {
-    min-height: 220px;
-  }
-
-  .modal-actions,
-  .modal-actions .primary-btn,
-  .secondary-modal-btn {
-    width: 100%;
-  }
 }
 
 @media (min-width: 640px) {
@@ -1385,8 +958,7 @@ footer small {
     grid-template-columns: 0.9fr 1.1fr;
   }
 
-  .equipment-grid,
-  .pricing-grid {
+  .equipment-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
