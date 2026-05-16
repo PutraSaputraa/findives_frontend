@@ -870,11 +870,17 @@ a {
   padding: 110px 18px 56px;
   display: flex;
   align-items: center;
-  background: url("${heroImage}") center / cover no-repeat;
+  background:
+    linear-gradient(90deg, rgba(8, 37, 53, 0.92), rgba(37, 74, 90, 0.62) 54%, rgba(8, 37, 53, 0.22)),
+    url("${heroImage}") center / cover;
 }
 
 .hero-overlay {
-  display: none;
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(8, 37, 53, 0.16), rgba(8, 37, 53, 0.72)),
+    radial-gradient(circle at 84% 22%, rgba(128, 153, 131, 0.18), transparent 26rem);
 }
 
 .hero-content {
