@@ -400,7 +400,7 @@ a {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #00D6F2;
+  background: #082535f0;
   backdrop-filter: blur(18px);
   border-bottom: 1px solid rgba(212, 225, 231, 0.16);
   transform: translateY(0);
