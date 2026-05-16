@@ -40,9 +40,104 @@ const fallbackEquipment  = [
   },
 ];
 
+const pricingTabs = [
+  {
+    id: "on-the-spot",
+    label: "On The Spot",
+    eyebrow: "Kolam Renang",
+    title: "Persewaan di Kolam Renang",
+    desc: "Harga per sesi untuk sewa langsung di tempat.",
+    items: [
+      {
+        name: "Semua Fin",
+        detail: "Long fins basic maupun premium",
+        price: "35K",
+        unit: "/ session",
+      },
+      {
+        name: "Snorkeling Mask",
+        detail: "Mask nyaman untuk snorkeling ringan",
+        price: "15K",
+        unit: "/ session",
+      },
+      {
+        name: "Low Volume Mask",
+        detail: "Mask compact untuk underwater practice",
+        price: "20K",
+        unit: "/ session",
+      },
+    ],
+  },
+  {
+    id: "daily",
+    label: "Per Hari",
+    eyebrow: "Luar Kolam",
+    title: "Persewaan di Luar Kolam Renang",
+    desc: "Harga per hari untuk pemakaian di luar area kolam renang.",
+    items: [
+      {
+        name: "Long Fins Basic",
+        detail: "Sewa harian untuk kebutuhan latihan atau trip",
+        price: "70K",
+        unit: "/ hari",
+      },
+      {
+        name: "Long Fins Premium",
+        detail: "Sewa harian untuk fin premium",
+        price: "125K",
+        unit: "/ hari",
+      },
+    ],
+  },
+  {
+    id: "package",
+    label: "Paket Insta360",
+    eyebrow: "Paket",
+    title: "Insta360 X5 Price List",
+    desc: "Paket untuk Kolam Renang UNY dan Umbul Ponggok.",
+    items: [
+      {
+        name: "Insta360 X5 + Dive Case + Selfie Stick + Videographer + Long Fins Fiberglass",
+        detail: "Paket lengkap dengan dokumentasi dan fins fiberglass",
+        price: "350K",
+        unit: "/ sesi",
+        originalPrice: "400K",
+      },
+      {
+        name: "Insta360 X5 + Dive Case + Selfie Stick + Videographer + Long Fins Wave",
+        detail: "Paket dokumentasi dengan long fins wave",
+        price: "250K",
+        unit: "/ sesi",
+        originalPrice: "300K",
+      },
+      {
+        name: "Insta360 X5 + Dive Case + Selfie Stick",
+        detail: "3 jam",
+        price: "150K",
+      },
+      {
+        name: "Insta360 X5 + Dive Case + Selfie Stick",
+        detail: "6 jam",
+        price: "225K",
+      },
+      {
+        name: "Insta360 X5 + Dive Case + Selfie Stick",
+        detail: "9 jam",
+        price: "275K",
+      },
+      {
+        name: "Insta360 X5 + Dive Case + Selfie Stick",
+        detail: "12 jam",
+        price: "300K",
+      },
+    ],
+  },
+];
+
 
 export default function App() {
   const equipmentData = fallbackEquipment;
+  const [activePricingTab, setActivePricingTab] = useState(pricingTabs[0].id);
   const [menuOpen, setMenuOpen] = useState(false);
   const [navbarHidden, setNavbarHidden] = useState(false);
 
@@ -81,7 +176,9 @@ export default function App() {
   const navItems = [
     ["Home", "#home"],
     ["Equipment", "#equipment"],
+    ["Harga", "#pricing"],
   ];
+  const selectedPricing = pricingTabs.find((tab) => tab.id === activePricingTab) || pricingTabs[0];
 
   return (
     <main className="findive-page">
@@ -163,6 +260,59 @@ export default function App() {
               </div>
             </article>
           ))}
+        </div>
+      </section>
+
+      <section className="section pricing-section" id="pricing">
+        <div className="section-head pricing-head">
+          <h2>PRICE LIST</h2>
+          <p>PILIH JENIS PERSEWAAN</p>
+        </div>
+
+        <div className="pricing-tabs" role="tablist" aria-label="Jenis persewaan">
+          {pricingTabs.map((tab) => (
+            <button
+              key={tab.id}
+              className={tab.id === activePricingTab ? "active" : ""}
+              type="button"
+              role="tab"
+              aria-selected={tab.id === activePricingTab}
+              aria-controls={`pricing-panel-${tab.id}`}
+              id={`pricing-tab-${tab.id}`}
+              onClick={() => setActivePricingTab(tab.id)}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        <div
+          className={`pricing-panel ${selectedPricing.id === "package" ? "package-panel" : ""}`}
+          id={`pricing-panel-${selectedPricing.id}`}
+          role="tabpanel"
+          aria-labelledby={`pricing-tab-${selectedPricing.id}`}
+        >
+          <div className="pricing-panel-intro">
+            <span>{selectedPricing.eyebrow}</span>
+            <h3>{selectedPricing.title}</h3>
+            <p>{selectedPricing.desc}</p>
+          </div>
+
+          <div className="pricing-list">
+            {selectedPricing.items.map((item, index) => (
+              <article className="pricing-item" key={`${item.name}-${item.detail}-${index}`}>
+                <div>
+                  <h4>{item.name}</h4>
+                  <p>{item.detail}</p>
+                </div>
+                <div className="pricing-value">
+                  {item.originalPrice && <span>{item.originalPrice}</span>}
+                  <strong>{item.price}</strong>
+                  {item.unit && <small>{item.unit}</small>}
+                </div>
+              </article>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -579,6 +729,174 @@ a {
   line-height: 1.55;
 }
 
+.pricing-section {
+  width: min(1160px, calc(100% - 32px));
+}
+
+.pricing-head h2 {
+  font-size: clamp(2rem, 6.5vw, 4.1rem);
+}
+
+.pricing-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  padding: 8px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(37, 74, 90, 0.12);
+  box-shadow: 0 18px 52px rgba(8, 37, 53, 0.08);
+}
+
+.pricing-tabs button {
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 0;
+  border-radius: 17px;
+  color: var(--deep-navy);
+  background: transparent;
+  cursor: pointer;
+  font-weight: 950;
+}
+
+.pricing-tabs button.active {
+  color: var(--white);
+  background: var(--dark-teal);
+  box-shadow: 0 14px 34px rgba(8, 37, 53, 0.2);
+}
+
+.pricing-panel {
+  margin-top: 18px;
+  padding: clamp(18px, 4vw, 28px);
+  border-radius: 30px;
+  background:
+    radial-gradient(circle at top right, rgba(128, 153, 131, 0.22), transparent 18rem),
+    rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(37, 74, 90, 0.12);
+  box-shadow: 0 24px 80px rgba(8, 37, 53, 0.12);
+}
+
+.pricing-panel-intro span {
+  color: var(--olive-green);
+  font-size: 0.78rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.pricing-panel-intro h3 {
+  margin: 8px 0 0;
+  color: var(--deep-navy);
+  font-size: clamp(1.7rem, 5vw, 3.1rem);
+  line-height: 0.98;
+  text-transform: uppercase;
+  font-style: italic;
+}
+
+.pricing-panel-intro p {
+  max-width: 620px;
+  margin: 10px 0 0;
+  color: var(--dark-teal);
+  line-height: 1.55;
+}
+
+.pricing-list {
+  margin-top: 22px;
+  display: grid;
+  gap: 12px;
+}
+
+.pricing-item {
+  min-height: 112px;
+  padding: 18px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: center;
+  border-radius: 22px;
+  background: rgba(212, 225, 231, 0.58);
+  border: 1px solid rgba(37, 74, 90, 0.1);
+}
+
+.pricing-item h4 {
+  margin: 0;
+  color: var(--deep-navy);
+  font-size: clamp(1.05rem, 3vw, 1.45rem);
+  line-height: 1.22;
+}
+
+.pricing-item p {
+  margin: 8px 0 0;
+  color: var(--dark-teal);
+  line-height: 1.45;
+}
+
+.pricing-value {
+  display: grid;
+  justify-items: end;
+  gap: 2px;
+  color: var(--deep-navy);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.pricing-value span {
+  position: relative;
+  color: rgba(8, 37, 53, 0.62);
+  font-size: 1.35rem;
+  font-style: italic;
+}
+
+.pricing-value span::after {
+  content: "";
+  position: absolute;
+  left: -4px;
+  right: -4px;
+  top: 50%;
+  height: 3px;
+  background: #d51f2f;
+  transform: rotate(-6deg);
+}
+
+.pricing-value strong {
+  font-size: clamp(2.2rem, 7vw, 4rem);
+  line-height: 0.9;
+  font-style: italic;
+}
+
+.pricing-value small {
+  color: var(--dark-teal);
+  font-weight: 850;
+}
+
+.package-panel {
+  color: var(--white);
+  background:
+    linear-gradient(180deg, rgba(8, 37, 53, 0.9), rgba(8, 37, 53, 0.78)),
+    url("${insta360}") center / cover;
+}
+
+.package-panel .pricing-panel-intro span {
+  color: #44d9f3;
+}
+
+.package-panel .pricing-panel-intro h3,
+.package-panel .pricing-item h4,
+.package-panel .pricing-value {
+  color: var(--white);
+}
+
+.package-panel .pricing-panel-intro p,
+.package-panel .pricing-item p,
+.package-panel .pricing-value small {
+  color: var(--pale-blue-gray);
+}
+
+.package-panel .pricing-item {
+  background: rgba(2, 6, 23, 0.62);
+  border-color: rgba(212, 225, 231, 0.12);
+}
+
 .note {
   margin: 22px auto 0;
   max-width: 760px;
@@ -929,6 +1247,23 @@ footer small {
 
   .hero-badges span {
     max-width: 100%;
+  }
+
+  .pricing-tabs {
+    grid-template-columns: 1fr;
+  }
+
+  .pricing-item {
+    grid-template-columns: 1fr;
+  }
+
+  .pricing-value {
+    justify-items: start;
+    text-align: left;
+  }
+
+  .pricing-value strong {
+    font-size: clamp(2rem, 14vw, 3.25rem);
   }
 
 }
