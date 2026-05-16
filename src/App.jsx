@@ -271,6 +271,7 @@ export default function App() {
   const [availabilityData, setAvailabilityData] = useState({});
   const [isLoadingFirebase, setIsLoadingFirebase] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [navbarHidden, setNavbarHidden] = useState(false);
   const [selectedEquipment, setSelectedEquipment] = useState(null);
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [activeCalendarItemId, setActiveCalendarItemId] = useState(fallbackEquipment[0].id);
@@ -364,6 +365,34 @@ export default function App() {
     loadFirebaseData();
   }, []);
 
+  useEffect(() => {
+    let lastScrollY = window.scrollY;
+
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      const isScrollingDown = currentScrollY > lastScrollY;
+
+      if (menuOpen) {
+        setNavbarHidden(false);
+        return;
+      }
+
+      if (currentScrollY < 80) {
+        setNavbarHidden(false);
+      } else {
+        setNavbarHidden(isScrollingDown);
+      }
+
+      lastScrollY = currentScrollY;
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [menuOpen]);
+
   const openWhatsApp = (message) => {
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, "_blank");
   };
@@ -424,7 +453,7 @@ export default function App() {
     <main className="findive-page">
       <style>{css}</style>
 
-      <nav className="navbar">
+      <nav className={`navbar ${navbarHidden ? "navbar-hidden" : ""}`}>
         <a className="brand" href="#home" onClick={() => setMenuOpen(false)}>
           findive.id
         </a>
@@ -802,6 +831,16 @@ a {
   background: rgba(8, 37, 53, 0.94);
   backdrop-filter: blur(18px);
   border-bottom: 1px solid rgba(212, 225, 231, 0.16);
+  transform: translateY(0);
+  opacity: 1;
+  transition: transform 0.32s ease, opacity 0.32s ease;
+  will-change: transform;
+}
+
+.navbar-hidden {
+  transform: translateY(-110%);
+  opacity: 0;
+  pointer-events: none;
 }
 
 .brand {
@@ -879,6 +918,24 @@ a {
   background: var(--deep-navy);
 }
 
+.hero::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 180px;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(8, 37, 53, 0) 0%,
+    rgba(8, 37, 53, 0.18) 32%,
+    rgba(212, 225, 231, 0.72) 72%,
+    var(--pale-blue-gray) 100%
+  );
+}
+
 .hero-video {
   position: absolute;
   inset: 0;
@@ -891,7 +948,7 @@ a {
 
 .hero-content {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   width: min(1120px, 100%);
   margin: 0 auto;
 }
@@ -1057,7 +1114,7 @@ a {
   width: 100%;
   padding-inline: max(16px, calc((100% - 1160px) / 2));
   background:
-    linear-gradient(180deg, rgba(212, 225, 231, 0.96), rgba(255, 255, 255, 0.9)),
+    linear-gradient(180deg, var(--pale-blue-gray) 0%, rgba(212, 225, 231, 0.96) 24%, rgba(255, 255, 255, 0.9) 100%),
     url("${equipmentPoster}") center / cover;
 }
 
