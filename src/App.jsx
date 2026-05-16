@@ -101,14 +101,12 @@ const pricingTabs = [
         detail: "Paket lengkap dengan dokumentasi dan fins fiberglass",
         price: "350K",
         unit: "/ sesi",
-        originalPrice: "400K",
       },
       {
         name: "Insta360 X5 + Dive Case + Selfie Stick + Videographer + Long Fins Wave",
         detail: "Paket dokumentasi dengan long fins wave",
         price: "250K",
         unit: "/ sesi",
-        originalPrice: "300K",
       },
       {
         name: "Insta360 X5 + Dive Case + Selfie Stick",
@@ -287,7 +285,7 @@ export default function App() {
         </div>
 
         <div
-          className={`pricing-panel ${selectedPricing.id === "package" ? "package-panel" : ""}`}
+          className="pricing-panel"
           id={`pricing-panel-${selectedPricing.id}`}
           role="tabpanel"
           aria-labelledby={`pricing-tab-${selectedPricing.id}`}
@@ -306,7 +304,6 @@ export default function App() {
                   <p>{item.detail}</p>
                 </div>
                 <div className="pricing-value">
-                  {item.originalPrice && <span>{item.originalPrice}</span>}
                   <strong>{item.price}</strong>
                   {item.unit && <small>{item.unit}</small>}
                 </div>
@@ -840,24 +837,6 @@ a {
   white-space: nowrap;
 }
 
-.pricing-value span {
-  position: relative;
-  color: rgba(8, 37, 53, 0.62);
-  font-size: 1.35rem;
-  font-style: italic;
-}
-
-.pricing-value span::after {
-  content: "";
-  position: absolute;
-  left: -4px;
-  right: -4px;
-  top: 50%;
-  height: 3px;
-  background: #d51f2f;
-  transform: rotate(-6deg);
-}
-
 .pricing-value strong {
   font-size: clamp(2.2rem, 7vw, 4rem);
   line-height: 0.9;
@@ -867,34 +846,6 @@ a {
 .pricing-value small {
   color: var(--dark-teal);
   font-weight: 850;
-}
-
-.package-panel {
-  color: var(--white);
-  background:
-    linear-gradient(180deg, rgba(8, 37, 53, 0.9), rgba(8, 37, 53, 0.78)),
-    url("${insta360}") center / cover;
-}
-
-.package-panel .pricing-panel-intro span {
-  color: #44d9f3;
-}
-
-.package-panel .pricing-panel-intro h3,
-.package-panel .pricing-item h4,
-.package-panel .pricing-value {
-  color: var(--white);
-}
-
-.package-panel .pricing-panel-intro p,
-.package-panel .pricing-item p,
-.package-panel .pricing-value small {
-  color: var(--pale-blue-gray);
-}
-
-.package-panel .pricing-item {
-  background: rgba(2, 6, 23, 0.62);
-  border-color: rgba(212, 225, 231, 0.12);
 }
 
 .note {
