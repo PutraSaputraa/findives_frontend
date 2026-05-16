@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import heroImage from "./assets/Frame 2.png";
+import heroVideo from "./assets/cinematic.MOV?url";
 import equipmentPoster from "./assets/Frame 60.png";
 import longFinsImage from "./assets/Frame 91.png";
 import maskImage from "./assets/Frame 92.png";
@@ -457,7 +457,15 @@ export default function App() {
       </nav>
 
       <section id="home" className="hero">
-        <div className="hero-overlay" />
+        <video
+          className="hero-video"
+          src={heroVideo}
+          autoPlay
+          muted
+          loop
+          playsInline
+        />
+
         <div className="hero-content">
 
           <p className="hero-subtitle">Sewa Long Fins & Dive Mask di Kolam Renang FIK-UNY</p>
@@ -869,17 +877,25 @@ a {
   padding: 110px 18px 56px;
   display: flex;
   align-items: center;
-  background:
-    linear-gradient(90deg, rgba(8, 37, 53, 0.92), rgba(37, 74, 90, 0.62) 54%, rgba(8, 37, 53, 0.22)),
-    url("${heroImage}") center / cover;
+  overflow: hidden;
+  background: var(--deep-navy);
 }
 
-.hero-overlay {
+.hero-video {
   position: absolute;
   inset: 0;
-  background:
-    linear-gradient(180deg, rgba(8, 37, 53, 0.16), rgba(8, 37, 53, 0.72)),
-    radial-gradient(circle at 84% 22%, rgba(128, 153, 131, 0.18), transparent 26rem);
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  z-index: 0;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  width: min(1120px, 100%);
+  margin: 0 auto;
 }
 
 .hero-content {
