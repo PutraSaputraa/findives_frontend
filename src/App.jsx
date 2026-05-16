@@ -460,6 +460,7 @@ export default function App() {
         <div className="hero-overlay" />
         <div className="hero-content">
 
+          <h1>WE ARE READY</h1>
           <p className="hero-subtitle">Sewa Long Fins & Dive Mask di Kolam Renang FIK-UNY</p>
           <p className="hero-copy">Just come and rent on the spot.</p>
 
