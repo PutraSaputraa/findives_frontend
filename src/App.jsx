@@ -8,7 +8,7 @@ import insta360 from "./assets/Frame 93.png";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "./firebase";
 
-const WHATSAPP_NUMBER = "6285799759626";
+const WHATSAPP_NUMBER = "628579975962600";
 
 const fallbackEquipment  = [
   {
