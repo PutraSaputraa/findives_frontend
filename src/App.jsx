@@ -5,10 +5,7 @@ import longFinsImage from "./assets/Frame 91.png";
 import maskImage from "./assets/Frame 92.png";
 import insta360 from "./assets/Frame 93.png";
 
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "./firebase";
-
-const WHATSAPP_NUMBER = "628579975962600";
+const WHATSAPP_NUMBER = "6285799759626";
 
 const fallbackEquipment  = [
   {
@@ -114,256 +111,11 @@ const fallbackEquipment  = [
 ];
 
 
-const weekdayOrder = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"];
-const weekdayByDateIndex = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
-const shortMonthNames = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
-
-const fallbackAvailabilitySchedule  = {
-  "long-fins-premium": {
-    totalStock: 1,
-    note: "Stok premium terbatas. Booking disarankan sebelum datang.",
-    weekly: {
-      Senin: "available",
-      Selasa: "available",
-      Rabu: "available",
-      Kamis: "available",
-      Jumat: "available",
-      Sabtu: "available",
-      Minggu: "available",
-    },
-    overrides: {},
-  },
-  "long-fins-basic": {
-    totalStock: 1,
-    note: "Pilihan paling aman untuk walk-in. Tetap cek dulu jika ingin datang saat jam ramai.",
-    weekly: {
-      Senin: "available",
-      Selasa: "available",
-      Rabu: "available",
-      Kamis: "available",
-      Jumat: "available",
-      Sabtu: "available",
-      Minggu: "available",
-    },
-    overrides: {},
-  },
-  "snorkeling-mask": {
-    totalStock: 1,
-    note: "Biasanya tersedia hampir setiap hari. Tetap cek WhatsApp untuk memastikan stok.",
-    weekly: {
-      Senin: "available",
-      Selasa: "available",
-      Rabu: "available",
-      Kamis: "available",
-      Jumat: "available",
-      Sabtu: "available",
-      Minggu: "available",
-    },
-    overrides: {},
-  },
-  "low-volume-mask": {
-    totalStock: 1,
-    note: "Cocok untuk underwater practice. Ketersediaan mengikuti stok di lokasi.",
-    weekly: {
-      Senin: "available",
-      Selasa: "available",
-      Rabu: "available",
-      Kamis: "available",
-      Jumat: "available",
-      Sabtu: "available",
-      Minggu: "available",
-    },
-    overrides: {},
-  },
-  insta360: {
-    totalStock: 1,
-    note: "Unit kamera terbatas. Sebaiknya chat dulu sebelum datang.",
-    weekly: {
-      Senin: "available",
-      Selasa: "available",
-      Rabu: "available",
-      Kamis: "available",
-      Jumat: "available",
-      Sabtu: "limited",
-      Minggu: "limited",
-    },
-    overrides: {},
-  },
-};
-
-const statusMeta = {
-  available: {
-    label: "Available",
-    shortLabel: "Ready",
-    className: "is-available",
-  },
-  limited: {
-    label: "Limited",
-    shortLabel: "Limited",
-    className: "is-limited",
-  },
-  unavailable: {
-    label: "Full Booked",
-    shortLabel: "Full",
-    className: "is-unavailable",
-  },
-};
-
-const getStartOfToday = () => {
-  const date = new Date();
-  date.setHours(0, 0, 0, 0);
-  return date;
-};
-
-const formatDateKey = (date) => {
-  const year = date.getFullYear();
-  const month = `${date.getMonth() + 1}`.padStart(2, "0");
-  const day = `${date.getDate()}`.padStart(2, "0");
-  return `${year}-${month}-${day}`;
-};
-
-const getNextDates = (count, startDate) =>
-  Array.from({ length: count }, (_, index) => {
-    const date = new Date(startDate);
-    date.setDate(startDate.getDate() + index);
-
-    return {
-      key: formatDateKey(date),
-      dayName: weekdayByDateIndex[date.getDay()],
-      dayNumber: date.getDate(),
-      month: shortMonthNames[date.getMonth()],
-      isToday: index === 0,
-      date,
-    };
-  });
-
-const getStatusForDate = (itemId, dateInfo, schedules) => {
-  const schedule = schedules[itemId];
-  if (!schedule) return "available";
-
-  return schedule.overrides?.[dateInfo.key] || schedule.weekly?.[dateInfo.dayName] || "available";
-};
-
-const getAvailabilitySummary = (itemId, dates, schedules) =>
-  dates.reduce(
-    (summary, dateInfo) => {
-      const status = getStatusForDate(itemId, dateInfo, schedules);
-      summary[status] += 1;
-      return summary;
-    },
-    { available: 0, limited: 0, unavailable: 0 }
-  );
-
-const getItemLabel = (item) => `${item.name} - ${item.badge}`;
-
-const normalizeWeekly = (weekly = {}) => ({
-  Senin: weekly.Senin || weekly.senin || "available",
-  Selasa: weekly.Selasa || weekly.selasa || "available",
-  Rabu: weekly.Rabu || weekly.rabu || "available",
-  Kamis: weekly.Kamis || weekly.kamis || "available",
-  Jumat: weekly.Jumat || weekly.jumat || "available",
-  Sabtu: weekly.Sabtu || weekly.sabtu || "available",
-  Minggu: weekly.Minggu || weekly.minggu || "available",
-});
-
 export default function App() {
-  const [equipmentData, setEquipmentData] = useState([]);
-  const [availabilityData, setAvailabilityData] = useState({});
-  const [isLoadingFirebase, setIsLoadingFirebase] = useState(true);
+  const equipmentData = fallbackEquipment;
   const [menuOpen, setMenuOpen] = useState(false);
   const [navbarHidden, setNavbarHidden] = useState(false);
   const [selectedEquipment, setSelectedEquipment] = useState(null);
-  const [calendarOpen, setCalendarOpen] = useState(false);
-  const [activeCalendarItemId, setActiveCalendarItemId] = useState(fallbackEquipment[0].id);
-  const [today, setToday] = useState(getStartOfToday);
-
-  useEffect(() => {
-    const loadFirebaseData = async () => {
-      try {
-        setIsLoadingFirebase(true);
-
-        const itemsSnapshot = await getDocs(collection(db, "items"));
-        const availabilitySnapshot = await getDocs(collection(db, "availability"));
-
-        const localImageById = fallbackEquipment.reduce((result, item) => {
-          result[item.id] = item.image;
-          return result;
-        }, {});
-
-        const localPricingById = fallbackEquipment.reduce((result, item) => {
-          result[item.id] = item.pricing;
-          return result;
-        }, {});
-
-        const itemsFromFirebase = itemsSnapshot.docs
-          .map((document) => {
-            const data = document.data();
-
-            return {
-              id: document.id,
-              name: data.name || "Unnamed Item",
-              startPrice: data.startPrice || "0",
-              startUnit: data.startUnit || "/ session",
-              desc: data.desc || "",
-              badge: data.badge || "Ready Stock",
-              totalStock: data.totalStock || 1,
-              note: data.note || data.desc || "",
-              weekly: normalizeWeekly(data.weekly),
-              image: localImageById[document.id] || longFinsImage,
-              pricing: data.pricing || localPricingById[document.id] || [],
-            };
-          })
-          .filter((item) => item.isActive !== false);
-
-        const nextEquipment = itemsFromFirebase.length > 0 ? itemsFromFirebase : fallbackEquipment;
-
-        const nextSchedules = {};
-
-        nextEquipment.forEach((item) => {
-          const fallbackSchedule = fallbackAvailabilitySchedule[item.id] || {};
-
-          nextSchedules[item.id] = {
-            totalStock: item.totalStock || fallbackSchedule.totalStock || 1,
-            note: item.note || fallbackSchedule.note || item.desc,
-            weekly: item.weekly || fallbackSchedule.weekly || normalizeWeekly(),
-            overrides: {},
-          };
-        });
-
-        availabilitySnapshot.docs.forEach((document) => {
-          const data = document.data();
-
-          if (!data.itemId || !data.date || !data.status) return;
-
-          if (!nextSchedules[data.itemId]) {
-            nextSchedules[data.itemId] = {
-              totalStock: 1,
-              note: "",
-              weekly: normalizeWeekly(),
-              overrides: {},
-            };
-          }
-
-          nextSchedules[data.itemId].overrides[data.date] = data.status;
-        });
-
-        setEquipmentData(nextEquipment);
-        setAvailabilityData(nextSchedules);
-
-        if (!nextEquipment.some((item) => item.id === activeCalendarItemId)) {
-          setActiveCalendarItemId(nextEquipment[0]?.id || fallbackEquipment[0].id);
-        }
-      } catch (error) {
-        console.error("Gagal mengambil data Firebase:", error);
-        setEquipmentData(fallbackEquipment);
-        setAvailabilityData(fallbackAvailabilitySchedule);
-      } finally {
-        setIsLoadingFirebase(false);
-      }
-    };
-
-    loadFirebaseData();
-  }, []);
 
   useEffect(() => {
     let lastScrollY = window.scrollY;
@@ -397,39 +149,11 @@ export default function App() {
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, "_blank");
   };
 
-  const nextDates = getNextDates(14, today);
-  const activeCalendarItem =
-    equipmentData.find((item) => item.id === activeCalendarItemId) ||
-    equipmentData[0] ||
-    fallbackEquipment[0];
-
-  const openAvailabilityCalendar = (itemId) => {
-    setActiveCalendarItemId(itemId);
-    setCalendarOpen(true);
-  };
-
   useEffect(() => {
-    const scheduleMidnightRefresh = () => {
-      const now = new Date();
-      const nextMidnight = new Date(now);
-      nextMidnight.setDate(now.getDate() + 1);
-      nextMidnight.setHours(0, 0, 1, 0);
-
-      return window.setTimeout(() => {
-        setToday(getStartOfToday());
-      }, nextMidnight.getTime() - now.getTime());
-    };
-
-    const timer = scheduleMidnightRefresh();
-    return () => window.clearTimeout(timer);
-  }, [today]);
-
-  useEffect(() => {
-    if (!calendarOpen && !selectedEquipment) return;
+    if (!selectedEquipment) return;
 
     const handleKeyDown = (event) => {
       if (event.key === "Escape") {
-        setCalendarOpen(false);
         setSelectedEquipment(null);
       }
     };
@@ -441,12 +165,11 @@ export default function App() {
       document.body.style.overflow = "";
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [calendarOpen, selectedEquipment]);
+  }, [selectedEquipment]);
 
   const navItems = [
     ["Home", "#home"],
     ["Pricelist", "#equipment"],
-    ["Availability", "#availability"],
   ];
 
   return (
@@ -542,143 +265,6 @@ export default function App() {
           ))}
         </div>
       </section>
-
-
-      <section className="section availability-section" id="availability">
-        <div className="section-head availability-head">
-          <span className="eyebrow">14 DAYS VIEW</span>
-          <h2>AVAILABILITY</h2>
-          <p>Cek hari available untuk setiap item.</p>
-        </div>
-
-        <div className="availability-card-grid">
-          {equipmentData.map((item) => {
-            const summary = getAvailabilitySummary(item.id, nextDates, availabilityData);
-            const schedule = availabilityData[item.id] || {
-              totalStock: item.totalStock || 1,
-              note: item.note || item.desc || "",
-              weekly: normalizeWeekly(),
-              overrides: {},
-            };
-
-            return (
-              <article className="availability-card" key={item.id}>
-                <div className="availability-card-top">
-                  <span className="availability-badge">{item.badge}</span>
-                  <span className="availability-stock">{schedule.totalStock} unit</span>
-                </div>
-
-                <h3>{getItemLabel(item)}</h3>
-                <p className="availability-price">
-                  {item.startPrice} <small>{item.startUnit}</small>
-                </p>
-                <p className="availability-copy">{schedule.note}</p>
-
-                <div className="availability-mini-summary">
-                  <span className="is-available">{summary.available} ready</span>
-                  <span className="is-limited">{summary.limited} limited</span>
-                  <span className="is-unavailable">{summary.unavailable} full</span>
-                </div>
-
-                <button className="calendar-open-btn" onClick={() => openAvailabilityCalendar(item.id)}>
-                  Lihat Kalender
-                </button>
-              </article>
-            );
-          })}
-        </div>
-      </section>
-
-      {calendarOpen && activeCalendarItem && (
-        <div className="modal-backdrop availability-backdrop" onClick={() => setCalendarOpen(false)}>
-          <div
-            className="availability-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="availability-modal-title"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <button
-              className="modal-close availability-close"
-              onClick={() => setCalendarOpen(false)}
-              aria-label="Close availability calendar"
-            >
-              x
-            </button>
-
-            <div className="availability-modal-head">
-              <p className="modal-kicker">14 DAYS CALENDAR</p>
-              <h3 id="availability-modal-title">{getItemLabel(activeCalendarItem)}</h3>
-              <p>{availabilityData[activeCalendarItem.id]?.note || activeCalendarItem.note || activeCalendarItem.desc}</p>
-
-              <div className="modal-item-switcher" aria-label="Pilih item availability">
-                {equipmentData.map((item) => (
-                  <button
-                    key={item.id}
-                    className={item.id === activeCalendarItem.id ? "active" : ""}
-                    onClick={() => setActiveCalendarItemId(item.id)}
-                  >
-                    {getItemLabel(item)}
-                  </button>
-                ))}
-              </div>
-
-              <label className="modal-item-select-label" htmlFor="availability-item-select">
-                Pilih item
-              </label>
-
-              <select
-                id="availability-item-select"
-                className="modal-item-select"
-                value={activeCalendarItem.id}
-                onChange={(event) => setActiveCalendarItemId(event.target.value)}
-              >
-                {equipmentData.map((item) => (
-                  <option key={item.id} value={item.id}>
-                    {getItemLabel(item)}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="availability-legend">
-              <span><i className="is-available" /> Available</span>
-              <span><i className="is-limited" /> Limited</span>
-              <span><i className="is-unavailable" /> Full Booked</span>
-            </div>
-
-            <div className="calendar-grid">
-              {nextDates.map((dateInfo) => {
-                const status = getStatusForDate(activeCalendarItem.id, dateInfo, availabilityData);
-                const meta = statusMeta[status];
-
-                return (
-                  <div className={`calendar-day ${meta.className}`} key={dateInfo.key}>
-                    <span className="calendar-day-name">{dateInfo.isToday ? "Hari ini" : dateInfo.dayName}</span>
-                    <strong>{dateInfo.dayNumber}</strong>
-                    <small>{dateInfo.month}</small>
-                    <b>{meta.shortLabel}</b>
-                  </div>
-                );
-              })}
-            </div>
-
-            <div className="availability-modal-actions">
-              <button
-                className="primary-btn"
-                onClick={() =>
-                  openWhatsApp(`Halo findive.id, saya ingin cek availability ${getItemLabel(activeCalendarItem)}.`)
-                }
-              >
-                Cek via WhatsApp
-              </button>
-              <button className="secondary-modal-btn" onClick={() => setCalendarOpen(false)}>
-                Tutup
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {selectedEquipment && (
         <div className="modal-backdrop" onClick={() => setSelectedEquipment(null)}>
@@ -1046,6 +632,10 @@ a {
   font-size: clamp(2.45rem, 10vw, 6rem);
 }
 
+.equipment .section-head h2 {
+  font-size: clamp(2rem, 6.5vw, 4.1rem);
+}
+
 .section-head p:not(.eyebrow) {
   margin: 10px 0 0;
   color: var(--dark-teal);
@@ -1212,290 +802,6 @@ a {
   color: var(--deep-navy) !important;
   background: transparent !important;
   border: 1px solid rgba(37, 74, 90, 0.22) !important;
-}
-
-.availability-section {
-  width: min(1160px, calc(100% - 32px));
-}
-
-.availability-head .eyebrow {
-  display: inline-flex;
-  width: fit-content;
-  padding: 8px 12px;
-  border-radius: 999px;
-  color: var(--white);
-  background: var(--olive-green);
-  font-size: 0.75rem;
-  font-weight: 950;
-  letter-spacing: 0.1em;
-}
-
-.availability-note {
-  margin: -8px 0 24px;
-  padding: 16px 18px;
-  border-radius: 22px;
-  color: var(--deep-navy);
-  background: rgba(212, 225, 231, 0.9);
-  border: 1px solid rgba(37, 74, 90, 0.1);
-  line-height: 1.55;
-}
-
-.availability-card-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 16px;
-}
-
-.availability-card {
-  padding: 22px;
-  border-radius: 28px;
-  background:
-    radial-gradient(circle at top right, rgba(152, 187, 215, 0.22), transparent 15rem),
-    rgba(255, 255, 255, 0.94);
-  border: 1px solid rgba(37, 74, 90, 0.12);
-  box-shadow: 0 22px 60px rgba(8, 37, 53, 0.12);
-}
-
-.availability-card-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.availability-badge,
-.availability-stock {
-  padding: 8px 11px;
-  border-radius: 999px;
-  font-size: 0.76rem;
-  font-weight: 950;
-}
-
-.availability-badge {
-  color: var(--white);
-  background: var(--dark-teal);
-}
-
-.availability-stock {
-  color: var(--deep-navy);
-  background: var(--pale-blue-gray);
-}
-
-.availability-card h3 {
-  margin: 18px 0 0;
-  color: var(--deep-navy);
-  font-size: 1.45rem;
-}
-
-.availability-price {
-  margin: 8px 0 12px;
-  color: var(--dark-teal);
-  font-size: 2.4rem;
-  line-height: 1;
-  font-weight: 950;
-}
-
-.availability-price small {
-  font-size: 0.86rem;
-}
-
-.availability-copy {
-  min-height: 54px;
-  margin: 0;
-  color: var(--dark-teal);
-  line-height: 1.55;
-}
-
-.availability-mini-summary {
-  margin: 18px 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.availability-mini-summary span {
-  padding: 8px 10px;
-  border-radius: 999px;
-  font-size: 0.78rem;
-  font-weight: 950;
-}
-
-.is-available {
-  color: #16351d;
-  background: rgba(128, 153, 131, 0.32);
-}
-
-.is-limited {
-  color: #4b3f18;
-  background: rgba(120, 140, 87, 0.35);
-}
-
-.is-unavailable {
-  color: #4b1820;
-  background: rgba(75, 24, 32, 0.12);
-}
-
-.calendar-open-btn {
-  width: 100%;
-  min-height: 48px;
-  border: 0;
-  border-radius: 999px;
-  color: var(--white);
-  background: var(--deep-navy);
-  font-weight: 950;
-  cursor: pointer;
-}
-
-.availability-backdrop {
-  align-items: center;
-}
-
-.availability-modal {
-  position: relative;
-  width: min(860px, 100%);
-  max-height: min(90svh, 780px);
-  overflow: auto;
-  padding: clamp(18px, 4vw, 30px);
-  border-radius: 30px;
-  background:
-    radial-gradient(circle at top right, rgba(152, 187, 215, 0.22), transparent 18rem),
-    var(--white);
-  border: 1px solid rgba(212, 225, 231, 0.44);
-  box-shadow: 0 30px 90px rgba(8, 37, 53, 0.38);
-}
-
-.availability-close {
-  color: var(--white);
-  background: var(--deep-navy);
-}
-
-.availability-modal-head h3 {
-  margin: 0;
-  padding-right: 48px;
-  color: var(--deep-navy);
-  font-size: clamp(2rem, 7vw, 4rem);
-  font-style: italic;
-  line-height: 0.95;
-  text-transform: uppercase;
-}
-
-.availability-modal-head p:not(.modal-kicker) {
-  max-width: 620px;
-  margin: 12px 0 0;
-  color: var(--dark-teal);
-  line-height: 1.55;
-}
-
-.modal-item-switcher {
-  margin-top: 18px;
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  padding-bottom: 4px;
-  scrollbar-width: none;
-}
-
-.modal-item-switcher::-webkit-scrollbar {
-  display: none;
-}
-
-.modal-item-switcher button {
-  flex: 0 0 auto;
-  min-height: 40px;
-  padding: 9px 12px;
-  border-radius: 999px;
-  border: 1px solid rgba(37, 74, 90, 0.18);
-  color: var(--deep-navy);
-  background: var(--pale-blue-gray);
-  font-weight: 850;
-  cursor: pointer;
-}
-
-.modal-item-switcher button.active {
-  color: var(--white);
-  background: var(--dark-teal);
-  border-color: var(--dark-teal);
-}
-
-.availability-legend {
-  margin-top: 20px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.availability-legend span {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 8px 10px;
-  border-radius: 999px;
-  color: var(--dark-teal);
-  background: var(--pale-blue-gray);
-  font-size: 0.78rem;
-  font-weight: 850;
-}
-
-.availability-legend i {
-  width: 12px;
-  height: 12px;
-  border-radius: 999px;
-}
-
-.calendar-grid {
-  margin-top: 18px;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.calendar-day {
-  min-height: 112px;
-  padding: 14px;
-  display: grid;
-  align-content: space-between;
-  border-radius: 22px;
-  border: 1px solid rgba(37, 74, 90, 0.1);
-}
-
-.calendar-day-name {
-  font-size: 0.78rem;
-  font-weight: 950;
-  text-transform: uppercase;
-}
-
-.calendar-day strong {
-  color: var(--deep-navy);
-  font-size: 2.1rem;
-  line-height: 0.95;
-}
-
-.calendar-day small {
-  color: var(--dark-teal);
-  font-weight: 850;
-}
-
-.calendar-day b {
-  width: fit-content;
-  margin-top: 8px;
-  padding: 6px 9px;
-  border-radius: 999px;
-  color: var(--deep-navy);
-  background: rgba(255, 255, 255, 0.5);
-  font-size: 0.7rem;
-  text-transform: uppercase;
-}
-
-.availability-modal-actions {
-  position: sticky;
-  bottom: -1px;
-  margin: 22px -4px -4px;
-  padding-top: 14px;
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0), var(--white) 30%);
 }
 
 .modal-backdrop {
@@ -2049,9 +1355,7 @@ footer small {
 
   .modal-actions,
   .modal-actions .primary-btn,
-  .secondary-modal-btn,
-  .availability-modal-actions,
-  .availability-modal-actions .primary-btn {
+  .secondary-modal-btn {
     width: 100%;
   }
 }
@@ -2061,13 +1365,8 @@ footer small {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .equipment-grid,
-  .availability-card-grid {
+  .equipment-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .calendar-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .booking-form {
@@ -2087,13 +1386,8 @@ footer small {
   }
 
   .equipment-grid,
-  .pricing-grid,
-  .availability-card-grid {
+  .pricing-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .calendar-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .step-grid {
@@ -2135,165 +1429,5 @@ footer small {
 }
   
 
-
-.modal-item-select-label,
-.modal-item-select {
-  display: none;
-}
-
-
-
-@media (max-width: 820px) {
-  .modal-backdrop.availability-backdrop {
-    position: fixed !important;
-    inset: 0 !important;
-    width: 100vw !important;
-    height: 100dvh !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    display: block !important;
-    background: rgba(8, 37, 53, 0.96) !important;
-    overflow: hidden !important;
-  }
-
-  .availability-modal {
-    position: fixed !important;
-    inset: 0 !important;
-    width: 100vw !important;
-    height: 100dvh !important;
-    max-height: none !important;
-    margin: 0 !important;
-    padding: 16px 14px 24px !important;
-    border: 0 !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-    overflow-y: auto !important;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .availability-close {
-    top: 14px !important;
-    right: 14px !important;
-    width: 36px !important;
-    height: 36px !important;
-    font-size: 0.95rem !important;
-  }
-
-  .availability-modal-head {
-    padding-right: 44px !important;
-  }
-
-  .availability-modal-head h3 {
-    padding-right: 0 !important;
-    font-size: clamp(1.8rem, 9.5vw, 2.45rem) !important;
-    line-height: 0.92 !important;
-    letter-spacing: -0.035em !important;
-  }
-
-  .availability-modal-head p:not(.modal-kicker) {
-    margin-top: 8px !important;
-    font-size: 0.78rem !important;
-    line-height: 1.45 !important;
-  }
-
-  .modal-kicker {
-    margin-bottom: 7px !important;
-    font-size: 0.64rem !important;
-    letter-spacing: 0.08em !important;
-  }
-
-  .modal-item-switcher {
-    display: none !important;
-  }
-
-  .modal-item-select-label {
-    display: block;
-    margin-top: 14px;
-    color: var(--olive-green);
-    font-size: 0.68rem;
-    font-weight: 950;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-
-  .modal-item-select {
-    display: block;
-    width: 100%;
-    min-height: 42px;
-    margin-top: 6px;
-    padding: 10px 12px;
-    border-radius: 14px;
-    border: 1px solid rgba(37, 74, 90, 0.18);
-    color: var(--deep-navy);
-    background: var(--pale-blue-gray);
-    font-weight: 850;
-    outline: none;
-  }
-
-  .availability-legend {
-    margin-top: 12px !important;
-    display: grid !important;
-    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-    gap: 6px !important;
-  }
-
-  .availability-legend span {
-    justify-content: center !important;
-    padding: 7px 6px !important;
-    font-size: 0.62rem !important;
-    text-align: center !important;
-  }
-
-  .availability-legend i {
-    width: 8px !important;
-    height: 8px !important;
-  }
-
-  .calendar-grid {
-    margin-top: 14px !important;
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    gap: 9px !important;
-  }
-
-  .calendar-day {
-    min-height: 96px !important;
-    padding: 11px !important;
-    border-radius: 16px !important;
-  }
-
-  .calendar-day-name {
-    font-size: 0.62rem !important;
-  }
-
-  .calendar-day strong {
-    font-size: 1.85rem !important;
-  }
-
-  .calendar-day small {
-    font-size: 0.72rem !important;
-  }
-
-  .calendar-day b {
-    margin-top: 5px !important;
-    padding: 5px 8px !important;
-    font-size: 0.58rem !important;
-  }
-
-  .availability-modal-actions {
-    position: static !important;
-    margin: 18px 0 0 !important;
-    padding: 0 0 calc(12px + env(safe-area-inset-bottom)) !important;
-    display: grid !important;
-    grid-template-columns: 1fr !important;
-    gap: 9px !important;
-    background: transparent !important;
-  }
-
-  .availability-modal-actions .primary-btn,
-  .availability-modal-actions .secondary-modal-btn {
-    width: 100% !important;
-    min-height: 46px !important;
-  }
-}
 
 `;
