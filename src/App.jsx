@@ -794,19 +794,19 @@ a {
   position: fixed;
   inset: 0 0 auto 0;
   z-index: 50;
-  min-height: 72px;
-  padding: 14px clamp(16px, 4vw, 48px);
+  min-height: 58px;
+  padding: 8px clamp(16px, 3vw, 44px);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: rgba(8, 37, 53, 0.88);
+  background: rgba(8, 37, 53, 0.94);
   backdrop-filter: blur(18px);
-  border-bottom: 1px solid rgba(212, 225, 231, 0.2);
+  border-bottom: 1px solid rgba(212, 225, 231, 0.16);
 }
 
 .brand {
   color: var(--white);
-  font-size: 1.35rem;
+  font-size: 1.15rem;
   font-weight: 800;
   letter-spacing: 0;
   text-decoration: none;
@@ -815,43 +815,41 @@ a {
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .nav-links a,
 .nav-cta {
-  min-height: 44px;
-  padding: 11px 16px;
+  min-height: 38px;
+  padding: 8px 14px;
   color: var(--pale-blue-gray);
   text-decoration: none;
   border: 0;
   border-radius: 999px;
   background: transparent;
   cursor: pointer;
-}
-
-.nav-links a:hover {
-  color: var(--white);
+  font-size: 0.9rem;
 }
 
 .nav-cta {
   color: white;
   font-weight: 800;
   background: var(--sage-green);
+  padding-inline: 18px;
 }
 
 .hamburger {
   display: none;
-  width: 46px;
-  height: 46px;
+  width: 40px;
+  height: 40px;
   border: 1px solid rgba(212, 225, 231, 0.2);
-  border-radius: 14px;
+  border-radius: 12px;
   background: rgba(255, 255, 255, 0.06);
 }
 
 .hamburger span {
   display: block;
-  width: 20px;
+  width: 18px;
   height: 2px;
   margin: 4px auto;
   border-radius: 999px;
@@ -874,7 +872,7 @@ a {
 .hero {
   position: relative;
   min-height: 100svh;
-  padding: 110px 18px 56px;
+  padding: 86px 18px 56px;
   display: flex;
   align-items: center;
   overflow: hidden;
