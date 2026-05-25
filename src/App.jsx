@@ -274,7 +274,6 @@ export default function App() {
           muted
           loop
           playsInline
-          preload="auto"
         />
 
         <div className="hero-content">
@@ -600,26 +599,11 @@ a {
 .hero {
   position: relative;
   min-height: 100svh;
-  padding: 86px 18px clamp(132px, 18vh, 190px);
+  padding: 86px 18px 56px;
   display: flex;
   align-items: center;
   overflow: hidden;
-  isolation: isolate;
   background: var(--deep-navy);
-}
-
-.hero::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  background: linear-gradient(
-    180deg,
-    rgba(8, 37, 53, 0.08) 0%,
-    rgba(8, 37, 53, 0.02) 38%,
-    rgba(8, 37, 53, 0) 100%
-  );
 }
 
 .hero::after {
@@ -627,17 +611,15 @@ a {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: -2px;
-  height: clamp(420px, 60vh, 720px);
+  bottom: -1px;
+  height: 180px;
   z-index: 1;
   pointer-events: none;
   background: linear-gradient(
     180deg,
-    rgba(212, 225, 231, 0) 0%,
-    rgba(212, 225, 231, 0.18) 24%,
-    rgba(212, 225, 231, 0.58) 48%,
-    rgba(212, 225, 231, 0.92) 68%,
-    var(--pale-blue-gray) 82%,
+    rgba(8, 37, 53, 0) 0%,
+    rgba(8, 37, 53, 0.18) 32%,
+    rgba(212, 225, 231, 0.72) 72%,
     var(--pale-blue-gray) 100%
   );
 }
@@ -655,6 +637,13 @@ a {
 .hero-content {
   position: relative;
   z-index: 2;
+  width: min(1120px, 100%);
+  margin: 0 auto;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
   width: min(1120px, 100%);
   margin: 0 auto;
 }
@@ -812,30 +801,9 @@ a {
 }
 
 .equipment {
-  position: relative;
-  z-index: 3;
   width: min(1160px, calc(100% - 32px));
-  margin-top: clamp(-210px, -22vh, -140px);
-  padding: clamp(24px, 4.5vw, 48px) 0 82px;
+  padding-inline: 0;
   background: transparent;
-}
-
-.equipment::before {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: -24px;
-  bottom: 0;
-  width: 100vw;
-  z-index: -1;
-  transform: translateX(-50%);
-  pointer-events: none;
-  background: linear-gradient(
-    180deg,
-    var(--pale-blue-gray) 0%,
-    rgba(255, 255, 255, 0.74) 58%,
-    rgba(212, 225, 231, 0) 100%
-  );
 }
 
 .equipment-grid {
