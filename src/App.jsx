@@ -274,6 +274,7 @@ export default function App() {
           muted
           loop
           playsInline
+          preload="auto"
         />
 
         <div className="hero-content">
@@ -612,14 +613,15 @@ a {
   left: 0;
   right: 0;
   bottom: -1px;
-  height: 180px;
+  height: clamp(180px, 26vh, 300px);
   z-index: 1;
   pointer-events: none;
   background: linear-gradient(
     180deg,
     rgba(8, 37, 53, 0) 0%,
-    rgba(8, 37, 53, 0.18) 32%,
-    rgba(212, 225, 231, 0.72) 72%,
+    rgba(8, 37, 53, 0.08) 22%,
+    rgba(212, 225, 231, 0.34) 56%,
+    rgba(212, 225, 231, 0.86) 82%,
     var(--pale-blue-gray) 100%
   );
 }
@@ -801,7 +803,11 @@ a {
 }
 
 .equipment {
+  position: relative;
+  z-index: 2;
   width: min(1160px, calc(100% - 32px));
+  margin-top: clamp(-72px, -6vw, -42px);
+  padding-top: clamp(56px, 7vw, 78px);
   padding-inline: 0;
   background: transparent;
 }
