@@ -600,11 +600,26 @@ a {
 .hero {
   position: relative;
   min-height: 100svh;
-  padding: 86px 18px 56px;
+  padding: 86px 18px clamp(132px, 18vh, 190px);
   display: flex;
   align-items: center;
   overflow: hidden;
+  isolation: isolate;
   background: var(--deep-navy);
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(8, 37, 53, 0.08) 0%,
+    rgba(8, 37, 53, 0.02) 38%,
+    rgba(8, 37, 53, 0) 100%
+  );
 }
 
 .hero::after {
@@ -612,16 +627,17 @@ a {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: -1px;
-  height: clamp(180px, 26vh, 300px);
+  bottom: -2px;
+  height: clamp(420px, 60vh, 720px);
   z-index: 1;
   pointer-events: none;
   background: linear-gradient(
     180deg,
-    rgba(8, 37, 53, 0) 0%,
-    rgba(8, 37, 53, 0.08) 22%,
-    rgba(212, 225, 231, 0.34) 56%,
-    rgba(212, 225, 231, 0.86) 82%,
+    rgba(212, 225, 231, 0) 0%,
+    rgba(212, 225, 231, 0.18) 24%,
+    rgba(212, 225, 231, 0.58) 48%,
+    rgba(212, 225, 231, 0.92) 68%,
+    var(--pale-blue-gray) 82%,
     var(--pale-blue-gray) 100%
   );
 }
@@ -639,13 +655,6 @@ a {
 .hero-content {
   position: relative;
   z-index: 2;
-  width: min(1120px, 100%);
-  margin: 0 auto;
-}
-
-.hero-content {
-  position: relative;
-  z-index: 1;
   width: min(1120px, 100%);
   margin: 0 auto;
 }
@@ -804,12 +813,29 @@ a {
 
 .equipment {
   position: relative;
-  z-index: 2;
+  z-index: 3;
   width: min(1160px, calc(100% - 32px));
-  margin-top: clamp(-72px, -6vw, -42px);
-  padding-top: clamp(56px, 7vw, 78px);
-  padding-inline: 0;
+  margin-top: clamp(-210px, -22vh, -140px);
+  padding: clamp(24px, 4.5vw, 48px) 0 82px;
   background: transparent;
+}
+
+.equipment::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -24px;
+  bottom: 0;
+  width: 100vw;
+  z-index: -1;
+  transform: translateX(-50%);
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    var(--pale-blue-gray) 0%,
+    rgba(255, 255, 255, 0.74) 58%,
+    rgba(212, 225, 231, 0) 100%
+  );
 }
 
 .equipment-grid {
