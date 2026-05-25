@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import heroGif from "./assets/cinematic.gif";
+import heroVideo from "./assets/cinematic.MOV?url";
 import longFinsImage from "./assets/Frame 91.png";
 import maskImage from "./assets/Frame 92.png";
 import insta360 from "./assets/Frame 93.png";
@@ -267,11 +267,13 @@ export default function App() {
       </nav>
 
       <section id="home" className="hero">
-        <img
+        <video
           className="hero-video"
-          src={heroGif}
-          alt=""
-          aria-hidden="true"
+          src={heroVideo}
+          autoPlay
+          muted
+          loop
+          playsInline
         />
 
         <div className="hero-content">
