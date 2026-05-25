@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import heroGif from "./assets/cinematic.gif";
+import heroVideo from "./assets/cinematic.MOV?url";
 import equipmentPoster from "./assets/Frame 60.png";
 import longFinsImage from "./assets/Frame 91.png";
 import maskImage from "./assets/Frame 92.png";
@@ -164,10 +164,39 @@ const testimonials = [
   },
 ];
 
+const faqs = [
+  {
+    id: "faq-1",
+    question: "Apakah bisa sewa langsung di kolam?",
+    answer: "Bisa. Untuk penyewaan on the spot, kamu bisa langsung datang ke area kolam dan memilih alat yang tersedia saat itu.",
+  },
+  {
+    id: "faq-2",
+    question: "Apakah perlu booking terlebih dahulu?",
+    answer: "Booking disarankan supaya alat yang kamu butuhkan bisa disiapkan lebih dulu, terutama saat akhir pekan atau jam ramai.",
+  },
+  {
+    id: "faq-3",
+    question: "Apa saja alat yang bisa disewa?",
+    answer: "Saat ini tersedia long fins basic, long fins premium, snorkeling mask, low volume mask, dan paket dokumentasi Insta360.",
+  },
+  {
+    id: "faq-4",
+    question: "Apakah alat boleh dibawa ke luar kolam?",
+    answer: "Boleh untuk item tertentu dengan sistem sewa harian. Detail harga dan ketersediaan bisa ditanyakan langsung lewat WhatsApp.",
+  },
+  {
+    id: "faq-5",
+    question: "Bagaimana cara menghubungi findive.id?",
+    answer: "Kamu bisa klik tombol WhatsApp di halaman ini untuk bertanya stok alat, harga, jadwal, atau kebutuhan sewa lainnya.",
+  },
+];
+
 export default function App() {
   const equipmentData = fallbackEquipment;
   const [activePricingTab, setActivePricingTab] = useState(pricingTabs[0].id);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
+  const [activeFaq, setActiveFaq] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [navbarHidden, setNavbarHidden] = useState(false);
 
@@ -219,6 +248,10 @@ export default function App() {
     setActiveTestimonial((current) => (current + 1) % testimonials.length);
   };
 
+  const toggleFaq = (index) => {
+    setActiveFaq((current) => (current === index ? null : index));
+  };
+
   const openWhatsApp = (message) => {
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, "_blank");
   };
@@ -228,6 +261,7 @@ export default function App() {
     ["Equipment", "#equipment"],
     ["Harga", "#pricing"],
     ["Testimoni", "#testimonials"],
+    ["FAQ", "#faq"],
   ];
   const selectedPricing = pricingTabs.find((tab) => tab.id === activePricingTab) || pricingTabs[0];
 
@@ -268,11 +302,13 @@ export default function App() {
       </nav>
 
       <section id="home" className="hero">
-        <img
+        <video
           className="hero-video"
-          src={heroGif}
-          alt=""
-          aria-hidden="true"
+          src={heroVideo}
+          autoPlay
+          muted
+          loop
+          playsInline
         />
 
         <div className="hero-content">
@@ -425,6 +461,41 @@ export default function App() {
               aria-current={index === activeTestimonial}
             />
           ))}
+        </div>
+      </section>
+
+
+      <section className="section faq-section" id="faq">
+        <div className="section-head faq-head">
+          <h2>FAQ</h2>
+          <p>PERTANYAAN YANG SERING DITANYAKAN</p>
+        </div>
+
+        <div className="faq-list">
+          {faqs.map((item, index) => {
+            const isOpen = activeFaq === index;
+
+            return (
+              <article className="faq-item" key={item.id}>
+                <button
+                  type="button"
+                  onClick={() => toggleFaq(index)}
+                  aria-expanded={isOpen}
+                  aria-controls={`faq-answer-${item.id}`}
+                >
+                  {item.question}
+                  <span>{isOpen ? "−" : "+"}</span>
+                </button>
+
+                <div
+                  className={`faq-answer ${isOpen ? "open" : ""}`}
+                  id={`faq-answer-${item.id}`}
+                >
+                  <p>{item.answer}</p>
+                </div>
+              </article>
+            );
+          })}
         </div>
       </section>
 
@@ -1215,6 +1286,33 @@ a {
   padding: 0 18px 18px;
   color: var(--dark-teal);
   line-height: 1.65;
+}
+
+
+.faq-section {
+  width: min(960px, calc(100% - 32px));
+  padding-top: 42px;
+}
+
+.faq-head h2 {
+  font-size: clamp(2rem, 6.5vw, 4.1rem);
+}
+
+.faq-list {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.faq-item button span {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--white);
+  background: var(--dark-teal);
+  line-height: 1;
 }
 
 .testimonial-section {
