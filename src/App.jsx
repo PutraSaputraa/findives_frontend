@@ -4,6 +4,9 @@ import equipmentPoster from "./assets/Frame 60.png";
 import longFinsImage from "./assets/Frame 91.png";
 import maskImage from "./assets/Frame 92.png";
 import insta360 from "./assets/Frame 93.png";
+import testi1 from "./assets/testi1.jpg";
+import testi2 from "./assets/testi2.jpg";
+import testi3 from "./assets/testi3.jpg";
 
 const WHATSAPP_NUMBER = "62895421909289";
 
@@ -133,9 +136,38 @@ const pricingTabs = [
 ];
 
 
+
+const testimonials = [
+  {
+    id: "testi-1",
+    name: "Raka",
+    role: "Freediving Beginner",
+    label: "On The Spot Rental",
+    text: "Sewanya praktis, tinggal datang ke kolam dan alatnya langsung siap dipakai. Fins-nya nyaman buat latihan.",
+    image: testi1,
+  },
+  {
+    id: "testi-2",
+    name: "Naya",
+    role: "Snorkeling Trip",
+    label: "Daily Rental",
+    text: "Mask dan fins bersih, ukuran juga pas. Cocok banget buat yang butuh alat dadakan untuk trip singkat.",
+    image: testi2,
+  },
+  {
+    id: "testi-3",
+    name: "Dimas",
+    role: "Underwater Content",
+    label: "Insta360 Package",
+    text: "Paket Insta360-nya worth it. Hasil dokumentasi underwater jadi lebih cinematic dan gampang buat konten.",
+    image: testi3,
+  },
+];
+
 export default function App() {
   const equipmentData = fallbackEquipment;
   const [activePricingTab, setActivePricingTab] = useState(pricingTabs[0].id);
+  const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [navbarHidden, setNavbarHidden] = useState(false);
 
@@ -167,6 +199,26 @@ export default function App() {
     };
   }, [menuOpen]);
 
+  useEffect(() => {
+    const testimonialTimer = window.setInterval(() => {
+      setActiveTestimonial((current) => (current + 1) % testimonials.length);
+    }, 4500);
+
+    return () => {
+      window.clearInterval(testimonialTimer);
+    };
+  }, []);
+
+  const goToPrevTestimonial = () => {
+    setActiveTestimonial((current) =>
+      current === 0 ? testimonials.length - 1 : current - 1
+    );
+  };
+
+  const goToNextTestimonial = () => {
+    setActiveTestimonial((current) => (current + 1) % testimonials.length);
+  };
+
   const openWhatsApp = (message) => {
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, "_blank");
   };
@@ -175,6 +227,7 @@ export default function App() {
     ["Home", "#home"],
     ["Equipment", "#equipment"],
     ["Harga", "#pricing"],
+    ["Testimoni", "#testimonials"],
   ];
   const selectedPricing = pricingTabs.find((tab) => tab.id === activePricingTab) || pricingTabs[0];
 
@@ -310,6 +363,70 @@ export default function App() {
               </article>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section className="section testimonial-section" id="testimonials">
+        <div className="section-head testimonial-head">
+          <h2>TESTIMONIALS</h2>
+          <p>CERITA CUSTOMER FINDIVE.ID</p>
+        </div>
+
+        <div className="testimonial-carousel" aria-label="Carousel testimoni pelanggan">
+          <button
+            className="testimonial-arrow prev"
+            type="button"
+            onClick={goToPrevTestimonial}
+            aria-label="Testimoni sebelumnya"
+          >
+            ‹
+          </button>
+
+          <div className="testimonial-viewport">
+            <div
+              className="testimonial-track"
+              style={{ transform: `translateX(-${activeTestimonial * 100}%)` }}
+            >
+              {testimonials.map((item) => (
+                <article className="testimonial-slide" key={item.id}>
+                  <div
+                    className="testimonial-image"
+                    style={{ backgroundImage: `url(${item.image})` }}
+                  />
+                  <div className="testimonial-content">
+                    <span>{item.label}</span>
+                    <p>“{item.text}”</p>
+                    <div className="testimonial-author">
+                      <strong>{item.name}</strong>
+                      <small>{item.role}</small>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+
+          <button
+            className="testimonial-arrow next"
+            type="button"
+            onClick={goToNextTestimonial}
+            aria-label="Testimoni berikutnya"
+          >
+            ›
+          </button>
+        </div>
+
+        <div className="testimonial-dots" aria-label="Pilih testimoni">
+          {testimonials.map((item, index) => (
+            <button
+              key={item.id}
+              type="button"
+              className={index === activeTestimonial ? "active" : ""}
+              onClick={() => setActiveTestimonial(index)}
+              aria-label={`Lihat testimoni ${index + 1}`}
+              aria-current={index === activeTestimonial}
+            />
+          ))}
         </div>
       </section>
 
@@ -1102,6 +1219,132 @@ a {
   line-height: 1.65;
 }
 
+.testimonial-section {
+  width: min(1160px, calc(100% - 32px));
+  padding-top: 42px;
+}
+
+.testimonial-head h2 {
+  font-size: clamp(2rem, 6.5vw, 4.1rem);
+}
+
+.testimonial-carousel {
+  position: relative;
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) 48px;
+  gap: 14px;
+  align-items: center;
+}
+
+.testimonial-viewport {
+  overflow: hidden;
+  border-radius: 32px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(37, 74, 90, 0.12);
+  box-shadow: 0 24px 80px rgba(8, 37, 53, 0.14);
+}
+
+.testimonial-track {
+  display: flex;
+  transition: transform 0.45s ease;
+  will-change: transform;
+}
+
+.testimonial-slide {
+  flex: 0 0 100%;
+  min-height: 420px;
+  display: grid;
+  grid-template-columns: 1.08fr 0.92fr;
+  background:
+    radial-gradient(circle at top right, rgba(128, 153, 131, 0.22), transparent 18rem),
+    rgba(255, 255, 255, 0.94);
+}
+
+.testimonial-image {
+  min-height: 420px;
+  background-size: cover;
+  background-position: center;
+}
+
+.testimonial-content {
+  padding: clamp(24px, 5vw, 48px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.testimonial-content span {
+  color: var(--olive-green);
+  font-size: 0.78rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.testimonial-content p {
+  margin: 16px 0 0;
+  color: var(--deep-navy);
+  font-size: clamp(1.25rem, 3.6vw, 2rem);
+  line-height: 1.32;
+  font-weight: 850;
+  font-style: italic;
+}
+
+.testimonial-author {
+  margin-top: 24px;
+  display: grid;
+  gap: 4px;
+}
+
+.testimonial-author strong {
+  color: var(--deep-navy);
+  font-size: 1.05rem;
+}
+
+.testimonial-author small {
+  color: var(--dark-teal);
+  font-weight: 750;
+}
+
+.testimonial-arrow {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  color: var(--white);
+  background: var(--dark-teal);
+  font-size: 2rem;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 16px 38px rgba(8, 37, 53, 0.2);
+}
+
+.testimonial-dots {
+  margin-top: 18px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.testimonial-dots button {
+  width: 10px;
+  height: 10px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(37, 74, 90, 0.28);
+  cursor: pointer;
+  transition: width 0.25s ease, background 0.25s ease;
+}
+
+.testimonial-dots button.active {
+  width: 34px;
+  background: var(--dark-teal);
+}
+
+
 footer {
   padding: 56px 18px 96px;
   text-align: center;
@@ -1215,6 +1458,36 @@ footer small {
 
   .pricing-value strong {
     font-size: clamp(2rem, 14vw, 3.25rem);
+  }
+
+  .testimonial-carousel {
+    grid-template-columns: 1fr;
+  }
+
+  .testimonial-slide {
+    min-height: auto;
+    grid-template-columns: 1fr;
+  }
+
+  .testimonial-image {
+    min-height: 260px;
+  }
+
+  .testimonial-arrow {
+    position: absolute;
+    top: 130px;
+    z-index: 2;
+    width: 42px;
+    height: 42px;
+    background: rgba(8, 37, 53, 0.86);
+  }
+
+  .testimonial-arrow.prev {
+    left: 14px;
+  }
+
+  .testimonial-arrow.next {
+    right: 14px;
   }
 
 }
