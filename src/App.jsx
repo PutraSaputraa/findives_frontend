@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import heroVideo from "./assets/cinematic.MOV?url";
+import heroVideo from "./assets/cinematic.gif?url";
 import equipmentPoster from "./assets/Frame 60.png";
 import longFinsImage from "./assets/Frame 91.png";
 import maskImage from "./assets/Frame 92.png";
