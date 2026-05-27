@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
-import heroVideo from "./assets/cinematic.MOV?url";
+import cinematic1 from "./assets/cinematic1.MOV?url";
+import cinematic2 from "./assets/cinematic2.MOV?url";
+import cinematic3 from "./assets/cinematic3.MOV?url";
 import equipmentPoster from "./assets/Frame 60.png";
 import longFinsImage from "./assets/Frame 91.png";
 import maskImage from "./assets/Frame 92.png";
@@ -9,6 +11,8 @@ import testi2 from "./assets/testi2.jpg";
 import testi3 from "./assets/testi3.jpg";
 
 const WHATSAPP_NUMBER = "62895421909289";
+
+const heroVideos = [cinematic1, cinematic2, cinematic3];
 
 const fallbackEquipment  = [
   {
@@ -199,6 +203,8 @@ export default function App() {
   const [activeFaq, setActiveFaq] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [navbarHidden, setNavbarHidden] = useState(false);
+  const [activeHeroVideo, setActiveHeroVideo] = useState(0);
+  const [heroVideoProgress, setHeroVideoProgress] = useState(0);
 
   useEffect(() => {
     let lastScrollY = window.scrollY;
@@ -252,6 +258,27 @@ export default function App() {
     setActiveFaq((current) => (current === index ? null : index));
   };
 
+  const goToHeroVideo = (index) => {
+    setHeroVideoProgress(0);
+    setActiveHeroVideo(index);
+  };
+
+  const goToNextHeroVideo = () => {
+    setHeroVideoProgress(0);
+    setActiveHeroVideo((current) => (current + 1) % heroVideos.length);
+  };
+
+  const updateHeroVideoProgress = (event) => {
+    const video = event.currentTarget;
+
+    if (!video.duration) {
+      setHeroVideoProgress(0);
+      return;
+    }
+
+    setHeroVideoProgress((video.currentTime / video.duration) * 100);
+  };
+
   const openWhatsApp = (message) => {
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, "_blank");
   };
@@ -303,12 +330,16 @@ export default function App() {
 
       <section id="home" className="hero">
         <video
+          key={activeHeroVideo}
           className="hero-video"
-          src={heroVideo}
+          src={heroVideos[activeHeroVideo]}
           autoPlay
           muted
-          loop
           playsInline
+          preload="auto"
+          onLoadedMetadata={() => setHeroVideoProgress(0)}
+          onTimeUpdate={updateHeroVideoProgress}
+          onEnded={goToNextHeroVideo}
         />
 
         <div className="hero-content">
@@ -325,6 +356,30 @@ export default function App() {
             >
               Booking via WhatsApp
             </button>
+          </div>
+
+          <div className="hero-video-indicators" aria-label="Pilih video hero">
+            {heroVideos.map((_, index) => {
+              const progress =
+                index < activeHeroVideo
+                  ? 100
+                  : index === activeHeroVideo
+                    ? heroVideoProgress
+                    : 0;
+
+              return (
+                <button
+                  key={index}
+                  type="button"
+                  className={index === activeHeroVideo ? "active" : ""}
+                  onClick={() => goToHeroVideo(index)}
+                  aria-label={`Tampilkan video ${index + 1}`}
+                  aria-current={index === activeHeroVideo}
+                >
+                  <span style={{ width: `${progress}%` }} />
+                </button>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -760,6 +815,44 @@ a {
   flex-wrap: wrap;
   gap: 12px;
   margin-top: 28px;
+}
+
+.hero-video-indicators {
+  width: min(420px, 100%);
+  margin-top: 30px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.hero-video-indicators button {
+  position: relative;
+  height: 4px;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(212, 225, 231, 0.34);
+  cursor: pointer;
+}
+
+.hero-video-indicators button::after {
+  content: "";
+  position: absolute;
+  inset: -8px 0;
+}
+
+.hero-video-indicators span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0;
+  border-radius: inherit;
+  background: var(--white);
+  transition: width 0.16s linear;
+}
+
+.hero-video-indicators button.active {
+  background: rgba(255, 255, 255, 0.34);
 }
 
 .primary-btn,
