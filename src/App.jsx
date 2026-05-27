@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import cinematic1 from "./assets/cinematic1.MOV?url";
 import cinematic2 from "./assets/cinematic2.MOV?url";
 import cinematic3 from "./assets/cinematic3.MOV?url";
@@ -196,13 +196,14 @@ const faqs = [
 ];
 
 export default function App() {
+  const heroVideoRef = useRef(null);
   const [activePricingTab, setActivePricingTab] = useState(pricingTabs[0].id);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [activeFaq, setActiveFaq] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [navbarHidden, setNavbarHidden] = useState(false);
   const [activeHeroVideo, setActiveHeroVideo] = useState(0);
-  const [previousHeroVideo, setPreviousHeroVideo] = useState(null);
+  const [previousHeroFrame, setPreviousHeroFrame] = useState(null);
   const [heroTransitionDirection, setHeroTransitionDirection] = useState("next");
   const [heroVideoDuration, setHeroVideoDuration] = useState(6);
 
@@ -261,7 +262,7 @@ export default function App() {
   const switchHeroVideo = (nextIndex, direction = "next") => {
     if (nextIndex === activeHeroVideo) return;
 
-    setPreviousHeroVideo(activeHeroVideo);
+    setPreviousHeroFrame(captureHeroFrame());
     setHeroTransitionDirection(direction);
     setHeroVideoDuration(6);
     setActiveHeroVideo(nextIndex);
@@ -288,6 +289,27 @@ export default function App() {
     setHeroVideoDuration(video.duration || 6);
   };
 
+  const captureHeroFrame = () => {
+    const video = heroVideoRef.current;
+
+    if (!video || !video.videoWidth || !video.videoHeight) {
+      return null;
+    }
+
+    try {
+      const canvas = document.createElement("canvas");
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+
+      const context = canvas.getContext("2d");
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      return canvas.toDataURL("image/jpeg", 0.82);
+    } catch {
+      return null;
+    }
+  };
+
   const openWhatsApp = (message) => {
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, "_blank");
   };
@@ -299,9 +321,7 @@ export default function App() {
     ["FAQ", "#faq"],
   ];
   const activeHeroSlide = heroSlides[activeHeroVideo];
-  const previousHeroSlide =
-    previousHeroVideo === null ? null : heroSlides[previousHeroVideo];
-  const isHeroSliding = previousHeroVideo !== null;
+  const isHeroSliding = previousHeroFrame !== null;
   const activePricing = pricingTabs.find((tab) => tab.id === activePricingTab) || pricingTabs[0];
   const activePricingCards = pricingCards.filter((item) => item.tabId === activePricingTab);
 
@@ -343,18 +363,16 @@ export default function App() {
 
       <section id="home" className="hero">
         <div className="hero-video-carousel" aria-hidden="true">
-          {previousHeroSlide && (
+          {previousHeroFrame && (
             <div
               className={`hero-video-layer previous ${
                 heroTransitionDirection === "next" ? "slide-out-left" : "slide-out-right"
               }`}
             >
-              <video
+              <img
                 className="hero-video"
-                src={previousHeroSlide.video}
-                muted
-                playsInline
-                preload="metadata"
+                src={previousHeroFrame}
+                alt=""
               />
             </div>
           )}
@@ -367,9 +385,10 @@ export default function App() {
                   : "slide-in-left"
                 : ""
             }`}
-            onAnimationEnd={() => setPreviousHeroVideo(null)}
+            onAnimationEnd={() => setPreviousHeroFrame(null)}
           >
             <video
+              ref={heroVideoRef}
               key={activeHeroSlide.id}
               className="hero-video"
               src={activeHeroSlide.video}
@@ -381,6 +400,12 @@ export default function App() {
               onEnded={goToNextHeroVideo}
             />
           </div>
+        </div>
+
+        <div className="hero-video-preload" aria-hidden="true">
+          {heroSlides.map((slide) => (
+            <video key={`preload-${slide.id}`} src={slide.video} muted playsInline preload="auto" />
+          ))}
         </div>
 
         <button
@@ -840,6 +865,20 @@ a {
   height: 100%;
   object-fit: cover;
   object-position: center;
+}
+
+.hero-video-preload {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.hero-video-preload video {
+  width: 1px;
+  height: 1px;
 }
 
 @keyframes heroSlideInRight {
