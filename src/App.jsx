@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import cinematic1 from "./assets/cinematic1.MOV?url";
 import cinematic2 from "./assets/cinematic2.MOV?url";
 import cinematic3 from "./assets/cinematic3.MOV?url";
@@ -198,6 +198,7 @@ const faqs = [
 
 export default function App() {
   const equipmentData = fallbackEquipment;
+  const heroVideoRefs = useRef([]);
   const [activePricingTab, setActivePricingTab] = useState(pricingTabs[0].id);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [activeFaq, setActiveFaq] = useState(0);
@@ -244,6 +245,20 @@ export default function App() {
     };
   }, []);
 
+  useEffect(() => {
+    heroVideoRefs.current.forEach((video, index) => {
+      if (!video) return;
+
+      if (index === activeHeroVideo) {
+        video.currentTime = 0;
+        video.play().catch(() => {});
+      } else {
+        video.pause();
+        video.currentTime = 0;
+      }
+    });
+  }, [activeHeroVideo]);
+
   const goToPrevTestimonial = () => {
     setActiveTestimonial((current) =>
       current === 0 ? testimonials.length - 1 : current - 1
@@ -261,6 +276,13 @@ export default function App() {
   const goToHeroVideo = (index) => {
     setHeroVideoProgress(0);
     setActiveHeroVideo(index);
+  };
+
+  const goToPrevHeroVideo = () => {
+    setHeroVideoProgress(0);
+    setActiveHeroVideo((current) =>
+      current === 0 ? heroVideos.length - 1 : current - 1
+    );
   };
 
   const goToNextHeroVideo = () => {
@@ -329,18 +351,55 @@ export default function App() {
       </nav>
 
       <section id="home" className="hero">
-        <video
-          key={activeHeroVideo}
-          className="hero-video"
-          src={heroVideos[activeHeroVideo]}
-          autoPlay
-          muted
-          playsInline
-          preload="auto"
-          onLoadedMetadata={() => setHeroVideoProgress(0)}
-          onTimeUpdate={updateHeroVideoProgress}
-          onEnded={goToNextHeroVideo}
-        />
+        <div className="hero-video-carousel" aria-hidden="true">
+          <div
+            className="hero-video-track"
+            style={{ transform: `translateX(-${activeHeroVideo * 100}%)` }}
+          >
+            {heroVideos.map((videoSrc, index) => (
+              <div className="hero-video-slide" key={videoSrc}>
+                <video
+                  ref={(element) => {
+                    heroVideoRefs.current[index] = element;
+                  }}
+                  className="hero-video"
+                  src={videoSrc}
+                  autoPlay={index === activeHeroVideo}
+                  muted
+                  playsInline
+                  preload="auto"
+                  onLoadedMetadata={() => {
+                    if (index === activeHeroVideo) setHeroVideoProgress(0);
+                  }}
+                  onTimeUpdate={(event) => {
+                    if (index === activeHeroVideo) updateHeroVideoProgress(event);
+                  }}
+                  onEnded={() => {
+                    if (index === activeHeroVideo) goToNextHeroVideo();
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <button
+          className="hero-video-arrow prev"
+          type="button"
+          onClick={goToPrevHeroVideo}
+          aria-label="Video sebelumnya"
+        >
+          ‹
+        </button>
+
+        <button
+          className="hero-video-arrow next"
+          type="button"
+          onClick={goToNextHeroVideo}
+          aria-label="Video berikutnya"
+        >
+          ›
+        </button>
 
         <div className="hero-content">
 
@@ -749,6 +808,30 @@ a {
   );
 }
 
+.hero-video-carousel {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.hero-video-track {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  transition: transform 0.72s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.hero-video-slide {
+  position: relative;
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--deep-navy);
+}
+
 .hero-video {
   position: absolute;
   inset: 0;
@@ -756,7 +839,39 @@ a {
   height: 100%;
   object-fit: cover;
   object-position: center;
-  z-index: 0;
+}
+
+.hero-video-arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 3;
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(212, 225, 231, 0.24);
+  border-radius: 50%;
+  color: var(--white);
+  background: rgba(8, 37, 53, 0.42);
+  backdrop-filter: blur(12px);
+  font-size: 2.35rem;
+  line-height: 1;
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.hero-video-arrow:hover {
+  background: rgba(8, 37, 53, 0.68);
+  transform: translateY(-50%) scale(1.04);
+}
+
+.hero-video-arrow.prev {
+  left: clamp(14px, 3vw, 36px);
+}
+
+.hero-video-arrow.next {
+  right: clamp(14px, 3vw, 36px);
 }
 
 .hero-content {
@@ -1626,6 +1741,19 @@ footer small {
   .hero-actions a,
   .hero-actions button {
     width: 100%;
+  }
+
+  .hero-video-arrow {
+    top: auto;
+    bottom: 92px;
+    width: 42px;
+    height: 42px;
+    font-size: 2rem;
+    transform: none;
+  }
+
+  .hero-video-arrow:hover {
+    transform: none;
   }
 
   .hero-badges span {
