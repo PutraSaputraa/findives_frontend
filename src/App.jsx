@@ -199,7 +199,7 @@ export default function App() {
   const heroVideoRefs = useRef([]);
   const [activePricingTab, setActivePricingTab] = useState(pricingTabs[0].id);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
-  const [activeFaq, setActiveFaq] = useState(0);
+  const [activeFaq, setActiveFaq] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [navbarHidden, setNavbarHidden] = useState(false);
   const [activeHeroVideo, setActiveHeroVideo] = useState(0);
@@ -433,6 +433,7 @@ export default function App() {
                 <button
                   key={index}
                   type="button"
+                  className="faq-question"
                   className={index === activeHeroVideo ? "active" : ""}
                   onClick={() => goToHeroVideo(index)}
                   aria-label={`Tampilkan video ${index + 1}`}
@@ -467,8 +468,12 @@ export default function App() {
         </div>
 
         <div className="pricing-grid">
-          {activePricingCards.map((item) => (
-            <article className="pricing-card" key={item.id}>
+          {activePricingCards.map((item, index) => (
+            <article
+              className="pricing-card"
+              key={item.id}
+              style={{ animationDelay: `${index * 80}ms` }}
+            >
               <div
                 className="pricing-card-image"
                 style={{ backgroundImage: `url(${item.image})` }}
@@ -580,7 +585,9 @@ export default function App() {
                   className={`faq-answer ${isOpen ? "open" : ""}`}
                   id={`faq-answer-${item.id}`}
                 >
-                  <p>{item.answer}</p>
+                  <div>
+                    <p>{item.answer}</p>
+                  </div>
                 </div>
               </article>
             );
@@ -1174,12 +1181,33 @@ a {
   background: rgba(255, 255, 255, 0.94);
   border: 1px solid rgba(37, 74, 90, 0.12);
   box-shadow: 0 24px 80px rgba(8, 37, 53, 0.14);
+  opacity: 0;
+  transform: translateY(24px) scale(0.96);
+  transform-origin: center;
+  animation: pricingCardIn 0.62s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease;
+  will-change: transform;
+}
+
+.pricing-card:hover {
+  border-color: rgba(37, 74, 90, 0.24);
+  box-shadow: 0 32px 90px rgba(8, 37, 53, 0.22);
+  transform: translateY(-8px) scale(1.025) rotate(-1deg);
+}
+
+.pricing-card:nth-child(even):hover {
+  transform: translateY(-8px) scale(1.025) rotate(1deg);
 }
 
 .pricing-card-image {
   min-height: 230px;
   background-size: cover;
   background-position: center;
+  transition: transform 0.34s ease;
+}
+
+.pricing-card:hover .pricing-card-image {
+  transform: scale(1.06);
 }
 
 .pricing-card-body {
@@ -1234,6 +1262,33 @@ a {
 .pricing-card-price small {
   color: var(--dark-teal);
   font-weight: 850;
+}
+
+@keyframes pricingCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pricing-card {
+    opacity: 1;
+    transform: none;
+    animation: none;
+    transition: none;
+  }
+
+  .pricing-card:hover,
+  .pricing-card:nth-child(even):hover,
+  .pricing-card:hover .pricing-card-image {
+    transform: none;
+  }
 }
 
 .note {
@@ -1452,11 +1507,12 @@ a {
   box-shadow: 0 18px 44px rgba(8, 37, 53, 0.08);
 }
 
-.faq-item button {
+.faq-question {
   width: 100%;
   min-height: 58px;
   padding: 18px;
   display: flex;
+  align-items: center;
   justify-content: space-between;
   gap: 16px;
   border: 0;
@@ -1467,25 +1523,37 @@ a {
   font-weight: 900;
 }
 
-.faq-item button span {
-  color: var(--dark-teal);
+.faq-question span {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--white);
+  background: var(--dark-teal);
   font-size: 1.4rem;
+  line-height: 1;
 }
 
 .faq-answer {
-  display: grid;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows 0.25s ease;
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.28s ease, opacity 0.22s ease;
 }
 
 .faq-answer.open {
-  grid-template-rows: 1fr;
+  max-height: 220px;
+  opacity: 1;
+}
+
+.faq-answer div {
+  padding: 0 18px 18px;
 }
 
 .faq-answer p {
-  overflow: hidden;
   margin: 0;
-  padding: 0 18px 18px;
   color: var(--dark-teal);
   line-height: 1.65;
 }
@@ -1503,18 +1571,6 @@ a {
 .faq-list {
   max-width: 960px;
   margin: 0 auto;
-}
-
-.faq-item button span {
-  flex: 0 0 auto;
-  width: 34px;
-  height: 34px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  color: var(--white);
-  background: var(--dark-teal);
-  line-height: 1;
 }
 
 .testimonial-section {
