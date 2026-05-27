@@ -772,18 +772,20 @@ a {
   height: 100%;
   object-fit: cover;
   object-position: center;
-  animation: heroVideoIn 0.72s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: heroVideoIn 0.72s ease both;
 }
 
 @keyframes heroVideoIn {
   from {
     opacity: 0;
-    transform: translateX(7%) scale(1.02);
+    transform: scale(1.035);
+    filter: blur(8px);
   }
 
   to {
     opacity: 1;
-    transform: translateX(0) scale(1);
+    transform: scale(1);
+    filter: blur(0);
   }
 }
 
@@ -839,13 +841,6 @@ a {
   margin: 0 auto;
 }
 
-.hero-content {
-  position: relative;
-  z-index: 1;
-  width: min(1120px, 100%);
-  margin: 0 auto;
-}
-
 .hero h1,
 .section-head h2 {
   margin: 0;
@@ -875,14 +870,14 @@ a {
   color: var(--white);
   font-size: clamp(1.28rem, 4vw, 2.3rem);
   font-weight: 800;
-  animation: heroTextIn 0.46s ease both;
+  animation: heroTextIn 0.42s ease both;
 }
 
 .hero-copy {
   margin: 12px 0 0;
   color: var(--pale-blue-gray);
   font-size: clamp(1rem, 3vw, 1.25rem);
-  animation: heroTextIn 0.46s ease 0.06s both;
+  animation: heroTextIn 0.42s ease 0.04s both;
 }
 
 .hero-actions {
@@ -890,13 +885,13 @@ a {
   flex-wrap: wrap;
   gap: 12px;
   margin-top: 28px;
-  animation: heroTextIn 0.46s ease 0.12s both;
+  animation: heroTextIn 0.42s ease 0.08s both;
 }
 
 @keyframes heroTextIn {
   from {
     opacity: 0;
-    transform: translateY(14px);
+    transform: translateY(10px);
   }
 
   to {
@@ -1241,6 +1236,13 @@ a {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .hero-video,
+  .hero-subtitle,
+  .hero-copy,
+  .hero-actions {
+    animation: none;
+  }
+
   .pricing-card {
     opacity: 1;
     transform: none;
