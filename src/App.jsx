@@ -11,6 +11,7 @@ const WHATSAPP_NUMBER = "62895421909289";
 
 const heroSlides = [
   {
+    id: "cinematic-1",
     video: cinematic1,
     subtitle: "Sewa Long Fins & Dive Mask di Kolam Renang FIK-UNY",
     copy: "Just come and rent on the spot.",
@@ -19,6 +20,7 @@ const heroSlides = [
       "Halo findive.id, saya ingin bertanya tentang sewa Long Fins dan Dive Mask.",
   },
   {
+    id: "cinematic-2",
     video: cinematic2,
     subtitle: "Latihan underwater lebih nyaman dengan equipment yang siap pakai",
     copy: "Pilih fins dan mask sesuai kebutuhan sesi kamu.",
@@ -27,6 +29,7 @@ const heroSlides = [
       "Halo findive.id, saya ingin cek ketersediaan equipment untuk latihan underwater.",
   },
   {
+    id: "cinematic-3",
     video: cinematic3,
     subtitle: "Dokumentasikan momen underwater dengan paket Insta360",
     copy: "Cocok untuk konten, trip, dan sesi seru di air.",
@@ -353,7 +356,7 @@ export default function App() {
             style={{ transform: `translateX(-${activeHeroVideo * 100}%)` }}
           >
             {heroSlides.map((slide, index) => (
-              <div className="hero-video-slide" key={slide.video}>
+              <div className="hero-video-slide" key={slide.id}>
                 <video
                   ref={(element) => {
                     heroVideoRefs.current[index] = element;
