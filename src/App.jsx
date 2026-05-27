@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import cinematic1 from "./assets/cinematic1.MOV?url";
 import cinematic2 from "./assets/cinematic2.MOV?url";
 import cinematic3 from "./assets/cinematic3.MOV?url";
-import equipmentPoster from "./assets/Frame 60.png";
 import insta360 from "./assets/Frame 93.png";
 import testi1 from "./assets/testi1.jpg";
 import testi2 from "./assets/testi2.jpg";
@@ -1123,9 +1122,12 @@ a {
 .pricing-section {
   width: 100%;
   padding-inline: max(16px, calc((100% - 1160px) / 2));
-  background:
-    linear-gradient(180deg, var(--pale-blue-gray) 0%, rgba(255, 255, 255, 0.92) 46%, var(--pale-blue-gray) 100%),
-    url("${equipmentPoster}") center / cover;
+  background: linear-gradient(
+    180deg,
+    var(--pale-blue-gray) 0%,
+    rgba(255, 255, 255, 0.9) 42%,
+    rgba(255, 255, 255, 0) 100%
+  );
 }
 
 .pricing-head h2 {
