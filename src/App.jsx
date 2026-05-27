@@ -47,7 +47,7 @@ const pricingTabs = [
     items: [
       {
         name: "Semua Fin",
-        detail: "Long fins basic maupun premium",
+        detail: "Long fins premium",
         price: "35K",
         unit: "/ session",
       },
@@ -72,12 +72,6 @@ const pricingTabs = [
     title: "Persewaan di Luar Kolam Renang",
     desc: "Harga per hari untuk pemakaian di luar area kolam renang.",
     items: [
-      {
-        name: "Long Fins Basic",
-        detail: "Sewa harian untuk kebutuhan latihan atau trip",
-        price: "70K",
-        unit: "/ hari",
-      },
       {
         name: "Long Fins Premium",
         detail: "Sewa harian untuk fin premium",
