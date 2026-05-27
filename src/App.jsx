@@ -202,7 +202,9 @@ export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [navbarHidden, setNavbarHidden] = useState(false);
   const [activeHeroVideo, setActiveHeroVideo] = useState(0);
-  const [heroVideoProgress, setHeroVideoProgress] = useState(0);
+  const [previousHeroVideo, setPreviousHeroVideo] = useState(null);
+  const [heroTransitionDirection, setHeroTransitionDirection] = useState("next");
+  const [heroVideoDuration, setHeroVideoDuration] = useState(6);
 
   useEffect(() => {
     let lastScrollY = window.scrollY;
@@ -256,32 +258,34 @@ export default function App() {
     setActiveFaq((current) => (current === index ? null : index));
   };
 
+  const switchHeroVideo = (nextIndex, direction = "next") => {
+    if (nextIndex === activeHeroVideo) return;
+
+    setPreviousHeroVideo(activeHeroVideo);
+    setHeroTransitionDirection(direction);
+    setHeroVideoDuration(6);
+    setActiveHeroVideo(nextIndex);
+  };
+
   const goToHeroVideo = (index) => {
-    setHeroVideoProgress(0);
-    setActiveHeroVideo(index);
+    const direction = index > activeHeroVideo ? "next" : "prev";
+    switchHeroVideo(index, direction);
   };
 
   const goToPrevHeroVideo = () => {
-    setHeroVideoProgress(0);
-    setActiveHeroVideo((current) =>
-      current === 0 ? heroSlides.length - 1 : current - 1
-    );
+    const nextIndex =
+      activeHeroVideo === 0 ? heroSlides.length - 1 : activeHeroVideo - 1;
+    switchHeroVideo(nextIndex, "prev");
   };
 
   const goToNextHeroVideo = () => {
-    setHeroVideoProgress(0);
-    setActiveHeroVideo((current) => (current + 1) % heroSlides.length);
+    const nextIndex = (activeHeroVideo + 1) % heroSlides.length;
+    switchHeroVideo(nextIndex, "next");
   };
 
-  const updateHeroVideoProgress = (event) => {
+  const updateHeroVideoDuration = (event) => {
     const video = event.currentTarget;
-
-    if (!video.duration) {
-      setHeroVideoProgress(0);
-      return;
-    }
-
-    setHeroVideoProgress((video.currentTime / video.duration) * 100);
+    setHeroVideoDuration(video.duration || 6);
   };
 
   const openWhatsApp = (message) => {
@@ -295,6 +299,9 @@ export default function App() {
     ["FAQ", "#faq"],
   ];
   const activeHeroSlide = heroSlides[activeHeroVideo];
+  const previousHeroSlide =
+    previousHeroVideo === null ? null : heroSlides[previousHeroVideo];
+  const isHeroSliding = previousHeroVideo !== null;
   const activePricing = pricingTabs.find((tab) => tab.id === activePricingTab) || pricingTabs[0];
   const activePricingCards = pricingCards.filter((item) => item.tabId === activePricingTab);
 
@@ -336,18 +343,44 @@ export default function App() {
 
       <section id="home" className="hero">
         <div className="hero-video-carousel" aria-hidden="true">
-          <video
-            key={activeHeroSlide.id}
-            className="hero-video"
-            src={activeHeroSlide.video}
-            autoPlay
-            muted
-            playsInline
-            preload="metadata"
-            onLoadedMetadata={() => setHeroVideoProgress(0)}
-            onTimeUpdate={updateHeroVideoProgress}
-            onEnded={goToNextHeroVideo}
-          />
+          {previousHeroSlide && (
+            <div
+              className={`hero-video-layer previous ${
+                heroTransitionDirection === "next" ? "slide-out-left" : "slide-out-right"
+              }`}
+            >
+              <video
+                className="hero-video"
+                src={previousHeroSlide.video}
+                muted
+                playsInline
+                preload="metadata"
+              />
+            </div>
+          )}
+
+          <div
+            className={`hero-video-layer current ${
+              isHeroSliding
+                ? heroTransitionDirection === "next"
+                  ? "slide-in-right"
+                  : "slide-in-left"
+                : ""
+            }`}
+            onAnimationEnd={() => setPreviousHeroVideo(null)}
+          >
+            <video
+              key={activeHeroSlide.id}
+              className="hero-video"
+              src={activeHeroSlide.video}
+              autoPlay
+              muted
+              playsInline
+              preload="metadata"
+              onLoadedMetadata={updateHeroVideoDuration}
+              onEnded={goToNextHeroVideo}
+            />
+          </div>
         </div>
 
         <button
@@ -390,23 +423,27 @@ export default function App() {
 
           <div className="hero-video-indicators" aria-label="Pilih video hero">
             {heroSlides.map((_, index) => {
-              const progress =
-                index < activeHeroVideo
-                  ? 100
-                  : index === activeHeroVideo
-                    ? heroVideoProgress
-                    : 0;
+              const isActive = index === activeHeroVideo;
+              const progressWidth = index < activeHeroVideo ? "100%" : "0%";
 
               return (
                 <button
                   key={index}
                   type="button"
-                  className={index === activeHeroVideo ? "active" : ""}
+                  className={isActive ? "active" : ""}
                   onClick={() => goToHeroVideo(index)}
                   aria-label={`Tampilkan video ${index + 1}`}
-                  aria-current={index === activeHeroVideo}
+                  aria-current={isActive}
                 >
-                  <span style={{ width: `${progress}%` }} />
+                  <span
+                    key={`${activeHeroVideo}-${heroVideoDuration}-${index}`}
+                    className={isActive ? "is-progressing" : ""}
+                    style={
+                      isActive
+                        ? { "--hero-progress-duration": `${heroVideoDuration}s` }
+                        : { width: progressWidth }
+                    }
+                  />
                 </button>
               );
             })}
@@ -765,27 +802,83 @@ a {
   overflow: hidden;
 }
 
-.hero-video {
+.hero-video-layer {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  object-position: center;
-  animation: heroVideoIn 0.72s ease both;
+  overflow: hidden;
+  background: var(--deep-navy);
 }
 
-@keyframes heroVideoIn {
+.hero-video-layer.current {
+  z-index: 2;
+}
+
+.hero-video-layer.previous {
+  z-index: 1;
+}
+
+.hero-video-layer.slide-in-right {
+  animation: heroSlideInRight 0.72s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.hero-video-layer.slide-in-left {
+  animation: heroSlideInLeft 0.72s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.hero-video-layer.slide-out-left {
+  animation: heroSlideOutLeft 0.72s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.hero-video-layer.slide-out-right {
+  animation: heroSlideOutRight 0.72s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.hero-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+@keyframes heroSlideInRight {
   from {
-    opacity: 0;
-    transform: scale(1.035);
-    filter: blur(8px);
+    transform: translateX(100%);
   }
 
   to {
-    opacity: 1;
-    transform: scale(1);
-    filter: blur(0);
+    transform: translateX(0);
+  }
+}
+
+@keyframes heroSlideInLeft {
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes heroSlideOutLeft {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes heroSlideOutRight {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(100%);
   }
 }
 
@@ -931,11 +1024,24 @@ a {
   width: 0;
   border-radius: inherit;
   background: var(--white);
-  transition: width 0.16s linear;
 }
 
 .hero-video-indicators button.active {
   background: rgba(255, 255, 255, 0.34);
+}
+
+.hero-video-indicators span.is-progressing {
+  animation: heroProgressFill var(--hero-progress-duration, 6s) linear forwards;
+}
+
+@keyframes heroProgressFill {
+  from {
+    width: 0;
+  }
+
+  to {
+    width: 100%;
+  }
 }
 
 .primary-btn,
@@ -1236,11 +1342,16 @@ a {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero-video,
+  .hero-video-layer,
   .hero-subtitle,
   .hero-copy,
-  .hero-actions {
+  .hero-actions,
+  .hero-video-indicators span.is-progressing {
     animation: none;
+  }
+
+  .hero-video-indicators span.is-progressing {
+    width: 100%;
   }
 
   .pricing-card {
