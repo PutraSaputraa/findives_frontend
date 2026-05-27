@@ -132,6 +132,7 @@ const pricingTabs = [
 const pricingCards = pricingTabs.flatMap((tab) =>
   tab.items.map((item, index) => ({
     id: `${tab.id}-${index}`,
+    tabId: tab.id,
     category: tab.label,
     name: item.name,
     desc: item.detail,
@@ -200,6 +201,7 @@ const faqs = [
 
 export default function App() {
   const heroVideoRefs = useRef([]);
+  const [activePricingTab, setActivePricingTab] = useState(pricingTabs[0].id);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [activeFaq, setActiveFaq] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -312,6 +314,8 @@ export default function App() {
     ["FAQ", "#faq"],
   ];
   const activeHeroSlide = heroSlides[activeHeroVideo];
+  const activePricing = pricingTabs.find((tab) => tab.id === activePricingTab) || pricingTabs[0];
+  const activePricingCards = pricingCards.filter((item) => item.tabId === activePricingTab);
 
   return (
     <main className="findive-page">
@@ -449,11 +453,25 @@ export default function App() {
       <section className="section pricing-section" id="pricing">
         <div className="section-head pricing-head">
           <h2>PRICE LIST</h2>
-          <p>PAKET PERSEWAAN FINDIVE.ID</p>
+          <p>{activePricing.desc}</p>
+        </div>
+
+        <div className="pricing-filter" aria-label="Pilih jenis persewaan">
+          {pricingTabs.map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              className={tab.id === activePricingTab ? "active" : ""}
+              onClick={() => setActivePricingTab(tab.id)}
+              aria-pressed={tab.id === activePricingTab}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
 
         <div className="pricing-grid">
-          {pricingCards.map((item) => (
+          {activePricingCards.map((item) => (
             <article className="pricing-card" key={item.id}>
               <div
                 className="pricing-card-image"
@@ -1120,6 +1138,32 @@ a {
   font-size: clamp(2rem, 6.5vw, 4.1rem);
 }
 
+.pricing-filter {
+  margin-bottom: 22px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.pricing-filter button {
+  min-height: 46px;
+  padding: 12px 16px;
+  border: 1px solid rgba(37, 74, 90, 0.16);
+  border-radius: 999px;
+  color: var(--deep-navy);
+  background: rgba(255, 255, 255, 0.84);
+  cursor: pointer;
+  font-weight: 950;
+  box-shadow: 0 12px 32px rgba(8, 37, 53, 0.08);
+}
+
+.pricing-filter button.active {
+  color: var(--white);
+  background: var(--dark-teal);
+  border-color: var(--dark-teal);
+  box-shadow: 0 16px 38px rgba(8, 37, 53, 0.18);
+}
+
 .pricing-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -1713,6 +1757,11 @@ footer small {
 
   .hero-badges span {
     max-width: 100%;
+  }
+
+  .pricing-filter {
+    display: grid;
+    grid-template-columns: 1fr;
   }
 
   .pricing-card-top {
