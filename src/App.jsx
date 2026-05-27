@@ -3,8 +3,6 @@ import cinematic1 from "./assets/cinematic1.MOV?url";
 import cinematic2 from "./assets/cinematic2.MOV?url";
 import cinematic3 from "./assets/cinematic3.MOV?url";
 import equipmentPoster from "./assets/Frame 60.png";
-import longFinsImage from "./assets/Frame 91.png";
-import maskImage from "./assets/Frame 92.png";
 import insta360 from "./assets/Frame 93.png";
 import testi1 from "./assets/testi1.jpg";
 import testi2 from "./assets/testi2.jpg";
@@ -36,39 +34,6 @@ const heroSlides = [
     buttonLabel: "Tanya Paket Insta360",
     whatsappMessage:
       "Halo findive.id, saya ingin bertanya tentang paket Insta360 underwater.",
-  },
-];
-
-const fallbackEquipment  = [
-  {
-    id: "long-fins-premium",
-    name: "Long Fins premium",
-    desc: "Long fins untuk latihan renang, freediving basic, dan pengalaman berenang lebih powerful.",
-    image: longFinsImage,
-  },
-  {
-    id: "long-fins-basic",
-    name: "Long Fins Basic",
-    desc: "Long fins untuk latihan renang, freediving basic, dan pengalaman berenang lebih powerful.",
-    image: longFinsImage,
-  },
-  {
-    id: "snorkeling-mask",
-    name: "Snorkeling Mask",
-    desc: "Mask nyaman untuk snorkeling ringan, latihan di kolam, dan kebutuhan basic underwater.",
-    image: maskImage,
-  },
-  {
-    id: "low-volume-mask",
-    name: "Low Volume Mask",
-    desc: "Mask low volume untuk pengalaman underwater yang lebih nyaman dan compact.",
-    image: maskImage,
-  },
-  {
-    id: "insta360",
-    name: "Insta360",
-    desc: "Camera 360 derajat untuk merekam pengalaman underwater yang unik.",
-    image: insta360,
   },
 ];
 
@@ -164,6 +129,18 @@ const pricingTabs = [
   },
 ];
 
+const pricingCards = pricingTabs.flatMap((tab) =>
+  tab.items.map((item, index) => ({
+    id: `${tab.id}-${index}`,
+    category: tab.label,
+    name: item.name,
+    desc: item.detail,
+    price: item.price,
+    unit: item.unit,
+    image: insta360,
+  }))
+);
+
 
 
 const testimonials = [
@@ -222,9 +199,7 @@ const faqs = [
 ];
 
 export default function App() {
-  const equipmentData = fallbackEquipment;
   const heroVideoRefs = useRef([]);
-  const [activePricingTab, setActivePricingTab] = useState(pricingTabs[0].id);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [activeFaq, setActiveFaq] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -332,12 +307,10 @@ export default function App() {
 
   const navItems = [
     ["Home", "#home"],
-    ["Equipment", "#equipment"],
     ["Harga", "#pricing"],
     ["Testimoni", "#testimonials"],
     ["FAQ", "#faq"],
   ];
-  const selectedPricing = pricingTabs.find((tab) => tab.id === activePricingTab) || pricingTabs[0];
   const activeHeroSlide = heroSlides[activeHeroVideo];
 
   return (
@@ -473,74 +446,32 @@ export default function App() {
         </div>
       </section>
 
-      <section className="section equipment" id="equipment">
-        <div className="section-head">
-          <h2>OUR EQUIPMENT</h2>
-          <p>PRODUK YANG KAMI MILIKI</p>
+      <section className="section pricing-section" id="pricing">
+        <div className="section-head pricing-head">
+          <h2>PRICE LIST</h2>
+          <p>PAKET PERSEWAAN FINDIVE.ID</p>
         </div>
 
-        <div className="equipment-grid">
-          {equipmentData.map((item) => (
-            <article className="equipment-card" key={item.id}>
-              <div className="equipment-image" style={{ backgroundImage: `url(${item.image})` }} />
-              <div className="equipment-body">
+        <div className="pricing-grid">
+          {pricingCards.map((item) => (
+            <article className="pricing-card" key={item.id}>
+              <div
+                className="pricing-card-image"
+                style={{ backgroundImage: `url(${item.image})` }}
+              />
+              <div className="pricing-card-body">
+                <div className="pricing-card-top">
+                  <span>{item.category}</span>
+                  <div className="pricing-card-price">
+                    <strong>{item.price}</strong>
+                    {item.unit && <small>{item.unit}</small>}
+                  </div>
+                </div>
                 <h3>{item.name}</h3>
                 <p>{item.desc}</p>
               </div>
             </article>
           ))}
-        </div>
-      </section>
-
-      <section className="section pricing-section" id="pricing">
-        <div className="section-head pricing-head">
-          <h2>PRICE LIST</h2>
-          <p>PILIH JENIS PERSEWAAN</p>
-        </div>
-
-        <div className="pricing-tabs" role="tablist" aria-label="Jenis persewaan">
-          {pricingTabs.map((tab) => (
-            <button
-              key={tab.id}
-              className={tab.id === activePricingTab ? "active" : ""}
-              type="button"
-              role="tab"
-              aria-selected={tab.id === activePricingTab}
-              aria-controls={`pricing-panel-${tab.id}`}
-              id={`pricing-tab-${tab.id}`}
-              onClick={() => setActivePricingTab(tab.id)}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
-        <div
-          className="pricing-panel"
-          id={`pricing-panel-${selectedPricing.id}`}
-          role="tabpanel"
-          aria-labelledby={`pricing-tab-${selectedPricing.id}`}
-        >
-          <div className="pricing-panel-intro">
-            <span>{selectedPricing.eyebrow}</span>
-            <h3>{selectedPricing.title}</h3>
-            <p>{selectedPricing.desc}</p>
-          </div>
-
-          <div className="pricing-list">
-            {selectedPricing.items.map((item, index) => (
-              <article className="pricing-item" key={`${item.name}-${item.detail}-${index}`}>
-                <div>
-                  <h4>{item.name}</h4>
-                  <p>{item.detail}</p>
-                </div>
-                <div className="pricing-value">
-                  <strong>{item.price}</strong>
-                  {item.unit && <small>{item.unit}</small>}
-                </div>
-              </article>
-            ))}
-          </div>
         </div>
       </section>
 
@@ -1178,123 +1109,87 @@ a {
 }
 
 .pricing-section {
-  width: min(1160px, calc(100% - 32px));
+  width: 100%;
+  padding-inline: max(16px, calc((100% - 1160px) / 2));
+  background:
+    linear-gradient(180deg, var(--pale-blue-gray) 0%, rgba(255, 255, 255, 0.92) 46%, var(--pale-blue-gray) 100%),
+    url("${equipmentPoster}") center / cover;
 }
 
 .pricing-head h2 {
   font-size: clamp(2rem, 6.5vw, 4.1rem);
 }
 
-.pricing-tabs {
+.pricing-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
-  padding: 8px;
-  border-radius: 24px;
-  background: rgba(255, 255, 255, 0.72);
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.pricing-card {
+  overflow: hidden;
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.94);
   border: 1px solid rgba(37, 74, 90, 0.12);
-  box-shadow: 0 18px 52px rgba(8, 37, 53, 0.08);
+  box-shadow: 0 24px 80px rgba(8, 37, 53, 0.14);
 }
 
-.pricing-tabs button {
-  min-height: 48px;
-  padding: 12px 14px;
-  border: 0;
-  border-radius: 17px;
-  color: var(--deep-navy);
-  background: transparent;
-  cursor: pointer;
-  font-weight: 950;
+.pricing-card-image {
+  min-height: 230px;
+  background-size: cover;
+  background-position: center;
 }
 
-.pricing-tabs button.active {
+.pricing-card-body {
+  padding: 22px;
+}
+
+.pricing-card-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: start;
+}
+
+.pricing-card-top span {
+  width: fit-content;
+  padding: 7px 10px;
+  border-radius: 999px;
   color: var(--white);
   background: var(--dark-teal);
-  box-shadow: 0 14px 34px rgba(8, 37, 53, 0.2);
-}
-
-.pricing-panel {
-  margin-top: 18px;
-  padding: clamp(18px, 4vw, 28px);
-  border-radius: 30px;
-  background:
-    radial-gradient(circle at top right, rgba(128, 153, 131, 0.22), transparent 18rem),
-    rgba(255, 255, 255, 0.92);
-  border: 1px solid rgba(37, 74, 90, 0.12);
-  box-shadow: 0 24px 80px rgba(8, 37, 53, 0.12);
-}
-
-.pricing-panel-intro span {
-  color: var(--olive-green);
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   font-weight: 950;
-  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
-.pricing-panel-intro h3 {
-  margin: 8px 0 0;
+.pricing-card h3 {
+  margin: 18px 0 0;
   color: var(--deep-navy);
-  font-size: clamp(1.7rem, 5vw, 3.1rem);
-  line-height: 0.98;
-  text-transform: uppercase;
-  font-style: italic;
+  font-size: clamp(1.18rem, 3vw, 1.55rem);
+  line-height: 1.18;
 }
 
-.pricing-panel-intro p {
-  max-width: 620px;
-  margin: 10px 0 0;
+.pricing-card p {
+  margin: 12px 0 0;
   color: var(--dark-teal);
   line-height: 1.55;
 }
 
-.pricing-list {
-  margin-top: 22px;
-  display: grid;
-  gap: 12px;
-}
-
-.pricing-item {
-  min-height: 112px;
-  padding: 18px;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 18px;
-  align-items: center;
-  border-radius: 22px;
-  background: rgba(212, 225, 231, 0.58);
-  border: 1px solid rgba(37, 74, 90, 0.1);
-}
-
-.pricing-item h4 {
-  margin: 0;
-  color: var(--deep-navy);
-  font-size: clamp(1.05rem, 3vw, 1.45rem);
-  line-height: 1.22;
-}
-
-.pricing-item p {
-  margin: 8px 0 0;
-  color: var(--dark-teal);
-  line-height: 1.45;
-}
-
-.pricing-value {
+.pricing-card-price {
   display: grid;
   justify-items: end;
-  gap: 2px;
   color: var(--deep-navy);
   text-align: right;
   white-space: nowrap;
 }
 
-.pricing-value strong {
-  font-size: clamp(2.2rem, 7vw, 4rem);
+.pricing-card-price strong {
+  font-size: clamp(2rem, 6vw, 3.2rem);
   line-height: 0.9;
   font-style: italic;
 }
 
-.pricing-value small {
+.pricing-card-price small {
   color: var(--dark-teal);
   font-weight: 850;
 }
@@ -1820,20 +1715,16 @@ footer small {
     max-width: 100%;
   }
 
-  .pricing-tabs {
+  .pricing-card-top {
     grid-template-columns: 1fr;
   }
 
-  .pricing-item {
-    grid-template-columns: 1fr;
-  }
-
-  .pricing-value {
+  .pricing-card-price {
     justify-items: start;
     text-align: left;
   }
 
-  .pricing-value strong {
+  .pricing-card-price strong {
     font-size: clamp(2rem, 14vw, 3.25rem);
   }
 
@@ -1878,6 +1769,10 @@ footer small {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .pricing-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .booking-form {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -1895,6 +1790,10 @@ footer small {
   }
 
   .equipment-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .pricing-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
