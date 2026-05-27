@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import cinematic1 from "./assets/cinematic1.MOV?url";
 import cinematic2 from "./assets/cinematic2.MOV?url";
 import cinematic3 from "./assets/cinematic3.MOV?url";
@@ -196,7 +196,6 @@ const faqs = [
 ];
 
 export default function App() {
-  const heroVideoRefs = useRef([]);
   const [activePricingTab, setActivePricingTab] = useState(pricingTabs[0].id);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [activeFaq, setActiveFaq] = useState(null);
@@ -242,20 +241,6 @@ export default function App() {
       window.clearInterval(testimonialTimer);
     };
   }, []);
-
-  useEffect(() => {
-    heroVideoRefs.current.forEach((video, index) => {
-      if (!video) return;
-
-      if (index === activeHeroVideo) {
-        video.currentTime = 0;
-        video.play().catch(() => {});
-      } else {
-        video.pause();
-        video.currentTime = 0;
-      }
-    });
-  }, [activeHeroVideo]);
 
   const goToPrevTestimonial = () => {
     setActiveTestimonial((current) =>
@@ -351,35 +336,18 @@ export default function App() {
 
       <section id="home" className="hero">
         <div className="hero-video-carousel" aria-hidden="true">
-          <div
-            className="hero-video-track"
-            style={{ transform: `translateX(-${activeHeroVideo * 100}%)` }}
-          >
-            {heroSlides.map((slide, index) => (
-              <div className="hero-video-slide" key={slide.id}>
-                <video
-                  ref={(element) => {
-                    heroVideoRefs.current[index] = element;
-                  }}
-                  className="hero-video"
-                  src={slide.video}
-                  autoPlay={index === activeHeroVideo}
-                  muted
-                  playsInline
-                  preload="auto"
-                  onLoadedMetadata={() => {
-                    if (index === activeHeroVideo) setHeroVideoProgress(0);
-                  }}
-                  onTimeUpdate={(event) => {
-                    if (index === activeHeroVideo) updateHeroVideoProgress(event);
-                  }}
-                  onEnded={() => {
-                    if (index === activeHeroVideo) goToNextHeroVideo();
-                  }}
-                />
-              </div>
-            ))}
-          </div>
+          <video
+            key={activeHeroSlide.id}
+            className="hero-video"
+            src={activeHeroSlide.video}
+            autoPlay
+            muted
+            playsInline
+            preload="metadata"
+            onLoadedMetadata={() => setHeroVideoProgress(0)}
+            onTimeUpdate={updateHeroVideoProgress}
+            onEnded={goToNextHeroVideo}
+          />
         </div>
 
         <button
@@ -433,7 +401,6 @@ export default function App() {
                 <button
                   key={index}
                   type="button"
-                  className="faq-question"
                   className={index === activeHeroVideo ? "active" : ""}
                   onClick={() => goToHeroVideo(index)}
                   aria-label={`Tampilkan video ${index + 1}`}
@@ -573,6 +540,7 @@ export default function App() {
               <article className="faq-item" key={item.id}>
                 <button
                   type="button"
+                  className="faq-question"
                   onClick={() => toggleFaq(index)}
                   aria-expanded={isOpen}
                   aria-controls={`faq-answer-${item.id}`}
@@ -797,23 +765,6 @@ a {
   overflow: hidden;
 }
 
-.hero-video-track {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  transition: transform 0.72s cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: transform;
-}
-
-.hero-video-slide {
-  position: relative;
-  flex: 0 0 100%;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  background: var(--deep-navy);
-}
-
 .hero-video {
   position: absolute;
   inset: 0;
@@ -821,6 +772,19 @@ a {
   height: 100%;
   object-fit: cover;
   object-position: center;
+  animation: heroVideoIn 0.72s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes heroVideoIn {
+  from {
+    opacity: 0;
+    transform: translateX(7%) scale(1.02);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
 }
 
 .hero-video-arrow {
@@ -1532,8 +1496,17 @@ a {
   border-radius: 50%;
   color: var(--white);
   background: var(--dark-teal);
-  font-size: 1.4rem;
+  font-size: 0;
   line-height: 1;
+}
+
+.faq-question span::before {
+  content: "+";
+  font-size: 1.4rem;
+}
+
+.faq-question[aria-expanded="true"] span::before {
+  content: "-";
 }
 
 .faq-answer {
