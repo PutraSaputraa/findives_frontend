@@ -12,7 +12,32 @@ import testi3 from "./assets/testi3.jpg";
 
 const WHATSAPP_NUMBER = "62895421909289";
 
-const heroVideos = [cinematic1, cinematic2, cinematic3];
+const heroSlides = [
+  {
+    video: cinematic1,
+    subtitle: "Sewa Long Fins & Dive Mask di Kolam Renang FIK-UNY",
+    copy: "Just come and rent on the spot.",
+    buttonLabel: "Booking via WhatsApp",
+    whatsappMessage:
+      "Halo findive.id, saya ingin bertanya tentang sewa Long Fins dan Dive Mask.",
+  },
+  {
+    video: cinematic2,
+    subtitle: "Latihan underwater lebih nyaman dengan equipment yang siap pakai",
+    copy: "Pilih fins dan mask sesuai kebutuhan sesi kamu.",
+    buttonLabel: "Cek Equipment",
+    whatsappMessage:
+      "Halo findive.id, saya ingin cek ketersediaan equipment untuk latihan underwater.",
+  },
+  {
+    video: cinematic3,
+    subtitle: "Dokumentasikan momen underwater dengan paket Insta360",
+    copy: "Cocok untuk konten, trip, dan sesi seru di air.",
+    buttonLabel: "Tanya Paket Insta360",
+    whatsappMessage:
+      "Halo findive.id, saya ingin bertanya tentang paket Insta360 underwater.",
+  },
+];
 
 const fallbackEquipment  = [
   {
@@ -281,13 +306,13 @@ export default function App() {
   const goToPrevHeroVideo = () => {
     setHeroVideoProgress(0);
     setActiveHeroVideo((current) =>
-      current === 0 ? heroVideos.length - 1 : current - 1
+      current === 0 ? heroSlides.length - 1 : current - 1
     );
   };
 
   const goToNextHeroVideo = () => {
     setHeroVideoProgress(0);
-    setActiveHeroVideo((current) => (current + 1) % heroVideos.length);
+    setActiveHeroVideo((current) => (current + 1) % heroSlides.length);
   };
 
   const updateHeroVideoProgress = (event) => {
@@ -313,6 +338,7 @@ export default function App() {
     ["FAQ", "#faq"],
   ];
   const selectedPricing = pricingTabs.find((tab) => tab.id === activePricingTab) || pricingTabs[0];
+  const activeHeroSlide = heroSlides[activeHeroVideo];
 
   return (
     <main className="findive-page">
@@ -356,14 +382,14 @@ export default function App() {
             className="hero-video-track"
             style={{ transform: `translateX(-${activeHeroVideo * 100}%)` }}
           >
-            {heroVideos.map((videoSrc, index) => (
-              <div className="hero-video-slide" key={videoSrc}>
+            {heroSlides.map((slide, index) => (
+              <div className="hero-video-slide" key={slide.video}>
                 <video
                   ref={(element) => {
                     heroVideoRefs.current[index] = element;
                   }}
                   className="hero-video"
-                  src={videoSrc}
+                  src={slide.video}
                   autoPlay={index === activeHeroVideo}
                   muted
                   playsInline
@@ -403,22 +429,26 @@ export default function App() {
 
         <div className="hero-content">
 
-          <p className="hero-subtitle">Sewa Long Fins & Dive Mask di Kolam Renang FIK-UNY</p>
-          <p className="hero-copy">Just come and rent on the spot.</p>
+          <p className="hero-subtitle" key={`subtitle-${activeHeroVideo}`}>
+            {activeHeroSlide.subtitle}
+          </p>
+          <p className="hero-copy" key={`copy-${activeHeroVideo}`}>
+            {activeHeroSlide.copy}
+          </p>
 
-          <div className="hero-actions">
+          <div className="hero-actions" key={`actions-${activeHeroVideo}`}>
             <button
               className="primary-btn"
               onClick={() =>
-                openWhatsApp("Halo findive.id, saya ingin bertanya tentang sewa Long Fins dan Dive Mask.")
+                openWhatsApp(activeHeroSlide.whatsappMessage)
               }
             >
-              Booking via WhatsApp
+              {activeHeroSlide.buttonLabel}
             </button>
           </div>
 
           <div className="hero-video-indicators" aria-label="Pilih video hero">
-            {heroVideos.map((_, index) => {
+            {heroSlides.map((_, index) => {
               const progress =
                 index < activeHeroVideo
                   ? 100
@@ -854,11 +884,23 @@ a {
   color: var(--white);
   background: rgba(8, 37, 53, 0.42);
   backdrop-filter: blur(12px);
-  font-size: 2.35rem;
+  font-size: 0;
   line-height: 1;
   cursor: pointer;
   transform: translateY(-50%);
   transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.hero-video-arrow::before {
+  font-size: 2.35rem;
+}
+
+.hero-video-arrow.prev::before {
+  content: "<";
+}
+
+.hero-video-arrow.next::before {
+  content: ">";
 }
 
 .hero-video-arrow:hover {
@@ -917,12 +959,14 @@ a {
   color: var(--white);
   font-size: clamp(1.28rem, 4vw, 2.3rem);
   font-weight: 800;
+  animation: heroTextIn 0.46s ease both;
 }
 
 .hero-copy {
   margin: 12px 0 0;
   color: var(--pale-blue-gray);
   font-size: clamp(1rem, 3vw, 1.25rem);
+  animation: heroTextIn 0.46s ease 0.06s both;
 }
 
 .hero-actions {
@@ -930,6 +974,19 @@ a {
   flex-wrap: wrap;
   gap: 12px;
   margin-top: 28px;
+  animation: heroTextIn 0.46s ease 0.12s both;
+}
+
+@keyframes heroTextIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .hero-video-indicators {
@@ -1748,8 +1805,11 @@ footer small {
     bottom: 92px;
     width: 42px;
     height: 42px;
-    font-size: 2rem;
     transform: none;
+  }
+
+  .hero-video-arrow::before {
+    font-size: 2rem;
   }
 
   .hero-video-arrow:hover {
