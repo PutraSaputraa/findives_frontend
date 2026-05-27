@@ -1081,8 +1081,7 @@ a {
   width: 100%;
   padding-inline: max(16px, calc((100% - 1160px) / 2));
   background:
-    linear-gradient(180deg, var(--pale-blue-gray) 0%, rgba(212, 225, 231, 0.96) 24%, rgba(255, 255, 255, 0.9) 100%),
-    url("${equipmentPoster}") center / cover;
+    linear-gradient(180deg, var(--pale-blue-gray) 0%, rgba(212, 225, 231, 0.96) 24%, rgba(255, 255, 255, 0.9) 100%);
 }
 
 .equipment-grid {
