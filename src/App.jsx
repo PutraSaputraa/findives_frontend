@@ -2,6 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import cinematic1 from "./assets/cinematic1.MOV?url";
 import cinematic2 from "./assets/cinematic2.MOV?url";
 import cinematic3 from "./assets/cinematic3.MOV?url";
+import fin from "./assets/Fin.png";
+import LowVolumeMask from "./assets/LowVolumeMask.png";
+import SnorkelingMask from "./assets/SnorkelingMask.png";
 import insta360 from "./assets/Frame 93.png";
 import testi1 from "./assets/testi1.jpg";
 import testi2 from "./assets/testi2.jpg";
@@ -48,22 +51,25 @@ const pricingTabs = [
     desc: "Harga per sesi untuk sewa langsung di tempat.",
     items: [
       {
-        name: "Semua Fin",
+        name: "Premium Fin",
         detail: "Long fins premium",
         price: "35K",
         unit: "/ session",
+        image: fin,
       },
       {
         name: "Snorkeling Mask",
         detail: "Mask nyaman untuk snorkeling ringan",
         price: "15K",
         unit: "/ session",
+        image: SnorkelingMask,
       },
       {
         name: "Low Volume Mask",
         detail: "Mask compact untuk underwater practice",
         price: "20K",
         unit: "/ session",
+        image: LowVolumeMask,
       },
     ],
   },
@@ -79,6 +85,7 @@ const pricingTabs = [
         detail: "Sewa harian untuk fin premium",
         price: "125K",
         unit: "/ hari",
+        image: fin,
       },
     ],
   },
@@ -134,7 +141,7 @@ const pricingCards = pricingTabs.flatMap((tab) =>
     desc: item.detail,
     price: item.price,
     unit: item.unit,
-    image: insta360,
+    image: item.image || insta360,
   }))
 );
 
