@@ -9,6 +9,7 @@ import insta360 from "./assets/Frame 93.png";
 import testi1 from "./assets/testi1.jpg";
 import testi2 from "./assets/testi2.jpg";
 import testi3 from "./assets/testi3.jpg";
+import whatsappIcon from "./assets/whatsapp.svg";
 
 const WHATSAPP_NUMBER = "62895421909289";
 
@@ -658,7 +659,7 @@ export default function App() {
         }
         aria-label="Chat WhatsApp"
       >
-        WA
+        <img src={whatsappIcon} alt="" aria-hidden="true" />
       </button>
     </main>
   );
@@ -1879,13 +1880,33 @@ footer small {
   z-index: 60;
   width: 58px;
   height: 58px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: 0;
   border-radius: 50%;
   color: var(--white);
   background: var(--dark-teal);
-  font-weight: 950;
   box-shadow: 0 18px 44px rgba(8, 37, 53, 0.34);
   cursor: pointer;
+  transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+}
+
+.floating-wa:hover {
+  transform: translateY(-2px);
+  background: #25d366;
+  box-shadow: 0 20px 50px rgba(8, 37, 53, 0.42);
+}
+
+.floating-wa:focus-visible {
+  outline: 3px solid rgba(212, 225, 231, 0.78);
+  outline-offset: 4px;
+}
+
+.floating-wa img {
+  width: 30px;
+  height: 30px;
+  display: block;
 }
 
 @media (max-width: 820px) {
